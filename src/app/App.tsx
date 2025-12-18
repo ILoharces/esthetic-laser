@@ -24,7 +24,7 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-[var(--color-secondary)] to-white w-full">
+    <div className="min-h-screen bg-gradient-to-b from-[var(--color-secondary)] via-[var(--color-accent)] to-[var(--color-secondary)] w-full">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-primary/10 sticky top-0 z-50 w-full">
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -36,7 +36,7 @@ export default function App() {
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden w-full">
+      <section className="hero-section py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden w-full">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none"></div>
         <div className="w-full text-center relative z-10 animate-fade-in-up">
           <div className="inline-block px-4 py-2 bg-primary/10 rounded-full mb-6">
@@ -63,8 +63,11 @@ export default function App() {
         </div>
       </section>
 
+      {/* Separator */}
+      <div className="section-separator w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+
       {/* Services Grid */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white w-full">
+      <section className="services-section py-24 px-4 sm:px-6 lg:px-8 bg-white w-full">
         <div className="w-full mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
@@ -107,8 +110,11 @@ export default function App() {
         </div>
       </section>
 
+      {/* Separator */}
+      <div className="section-separator w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+
       {/* Contact & Location Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--color-secondary)] to-white w-full">
+      <section className="contact-section py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[var(--color-secondary)] to-white w-full">
         <div className="w-full mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">Visítanos</h2>
@@ -193,8 +199,11 @@ export default function App() {
         </div>
       </section>
 
+      {/* Separator */}
+      <div className="section-separator w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+
       {/* Footer */}
-      <footer className="bg-gradient-to-br from-primary to-primary-dark text-primary-foreground py-12 px-4 sm:px-6 lg:px-8 mt-20 w-full">
+      <footer className="footer-section bg-gradient-to-br from-primary to-primary-dark text-primary-foreground py-12 px-4 sm:px-6 lg:px-8 w-full">
         <div className="w-full mx-auto">
           <div className="text-center">
             <h3 className="text-2xl font-bold mb-4">Esthetic Laser</h3>

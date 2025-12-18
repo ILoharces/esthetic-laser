@@ -2,15 +2,15 @@
 
 /* Theme Variables */
 @theme {
-  --color-primary: #6366F1;
-  --color-primary-dark: #4F46E5;
-  --color-primary-light: #818CF8;
+  --color-primary: #EC4899;
+  --color-primary-dark: #DB2777;
+  --color-primary-light: #F472B6;
   --color-primary-foreground: #FFFFFF;
-  --color-secondary: #F8FAFC;
-  --color-accent: #F1F5F9;
-  --color-foreground: #0F172A;
-  --color-muted-foreground: #64748B;
-  --color-border: #E2E8F0;
+  --color-secondary: #FDF2F8;
+  --color-accent: #FCE7F3;
+  --color-foreground: #831843;
+  --color-muted-foreground: #9F1239;
+  --color-border: #FBCFE8;
 }
 
 /* Custom color utilities */
@@ -47,18 +47,17 @@
 }
 
 .border-primary\/10 {
-  border-color: rgba(99, 102, 241, 0.1);
+  border-color: rgba(236, 72, 153, 0.1);
 }
 
 .border-primary\/30 {
-  border-color: rgba(99, 102, 241, 0.3);
+  border-color: rgba(236, 72, 153, 0.3);
 }
 
 /* Global Styles */
 * {
-  margin: 0;
+  margin-top: 0px;
   padding: 0;
-  box-sizing: border-box;
 }
 
 html {
@@ -72,7 +71,7 @@ body {
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   color: var(--color-foreground);
-  background-color: #FFFFFF;
+  background-color: #FDF2F8;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
@@ -122,7 +121,7 @@ body {
   border-radius: 0.5rem;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.2);
   border: none;
   cursor: pointer;
   display: inline-block;
@@ -130,7 +129,7 @@ body {
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.3);
 }
 
 .btn-secondary {
@@ -149,5 +148,30 @@ body {
   background: var(--color-primary);
   color: var(--color-primary-foreground);
   transform: translateY(-2px);
+}
+
+/* Section Margins */
+.hero-section {
+  margin-bottom: 6rem; /* 24 * 0.25rem = 6rem */
+  margin-top: 30px;
+}
+
+.services-section {
+  margin-top: 6rem;
+  margin-bottom: 6rem;
+}
+
+.contact-section {
+  margin-top: 6rem;
+  margin-bottom: 6rem;
+}
+
+.footer-section {
+  margin-top: 6rem;
+}
+
+.section-separator {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
