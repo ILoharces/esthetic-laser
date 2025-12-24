@@ -152,8 +152,7 @@ body {
 
 /* Section Margins */
 .hero-section {
-  margin-bottom: 6rem; /* 24 * 0.25rem = 6rem */
-  margin-top: 30px;
+  /* Hero section now uses min-h-screen and flexbox for full viewport height */
 }
 
 .services-section {

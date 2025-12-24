@@ -1,0 +1,71 @@
+{
+    "packBonosChico": [
+      {
+        "zona": "Axilas + Ingles + Pubis + Interglúteo",
+        "opciones": [
+          { "sesiones": 1, "precioOriginal": 69, "precioFinal": 55, "descuento": 20 },
+          { "sesiones": 3, "precioOriginal": 185, "precioFinal": 130, "descuento": 30 },
+          { "sesiones": 5, "precioOriginal": 293, "precioFinal": 176, "descuento": 40 }
+        ]
+      },
+      {
+        "zona": "Pecho + Abdomen + Espalda Completa + Axilas + Brazos completos + Manos + Hombros",
+        "opciones": [
+          { "sesiones": 1, "precioOriginal": 195, "precioFinal": 156, "descuento": 20 },
+          { "sesiones": 3, "precioOriginal": 539, "precioFinal": 377, "descuento": 30 },
+          { "sesiones": 5, "precioOriginal": 869, "precioFinal": 521, "descuento": 40 }
+        ]
+      },
+      {
+        "zona": "Piernas enteras + Pies + Axilas + Pubis + Ingles + Glúteo + Interglúteo",
+        "opciones": [
+          { "sesiones": 1, "precioOriginal": 168, "precioFinal": 134, "descuento": 20 },
+          { "sesiones": 3, "precioOriginal": 488, "precioFinal": 342, "descuento": 30 },
+          { "sesiones": 5, "precioOriginal": 803, "precioFinal": 482, "descuento": 40 }
+        ]
+      },
+      {
+        "zona": "Cuerpo entero (No incluye zona genital ni facial)",
+        "opciones": [
+          { "sesiones": 1, "precioOriginal": 200, "precioFinal": 160, "descuento": 20 },
+          { "sesiones": 3, "precioOriginal": 645, "precioFinal": 452, "descuento": 30 },
+          { "sesiones": 5, "precioOriginal": 1050, "precioFinal": 630, "descuento": 40 }
+        ]
+      }
+    ],
+    "packBonosChica": [
+      {
+        "zona": "Axilas + Ingles + Pubis + Interglúteo",
+        "opciones": [
+          { "sesiones": 1, "precioOriginal": 47, "precioFinal": 38, "descuento": 20 },
+          { "sesiones": 3, "precioOriginal": 128, "precioFinal": 90, "descuento": 30 },
+          { "sesiones": 5, "precioOriginal": 209, "precioFinal": 125, "descuento": 40 }
+        ]
+      },
+      {
+        "zona": "Medias piernas + Axilas + Ingles + Pubis + Interglúteo",
+        "opciones": [
+          { "sesiones": 1, "precioOriginal": 98, "precioFinal": 78, "descuento": 20 },
+          { "sesiones": 3, "precioOriginal": 278, "precioFinal": 195, "descuento": 30 },
+          { "sesiones": 5, "precioOriginal": 465, "precioFinal": 279, "descuento": 40 }
+        ]
+      },
+      {
+        "zona": "Piernas enteras + Axilas + Ingles + Pubis + Interglúteo",
+        "opciones": [
+          { "sesiones": 1, "precioOriginal": 105, "precioFinal": 84, "descuento": 20 },
+          { "sesiones": 3, "precioOriginal": 305, "precioFinal": 214, "descuento": 30 },
+          { "sesiones": 5, "precioOriginal": 510, "precioFinal": 306, "descuento": 40 }
+        ]
+      },
+      {
+        "zona": "Cuerpo entero (No incluye facial)",
+        "opciones": [
+          { "sesiones": 1, "precioOriginal": 158, "precioFinal": 126, "descuento": 20 },
+          { "sesiones": 3, "precioOriginal": 464, "precioFinal": 325, "descuento": 30 },
+          { "sesiones": 5, "precioOriginal": 720, "precioFinal": 432, "descuento": 40 }
+        ]
+      }
+    ]
+  }
+  
