@@ -153,6 +153,7 @@ body {
 /* Section Margins */
 .hero-section {
   /* Hero section now uses min-h-screen and flexbox for full viewport height */
+  padding: 1rem 0;
 }
 
 .services-section {
@@ -172,5 +173,80 @@ body {
 .section-separator {
   margin-top: 2rem;
   margin-bottom: 2rem;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 640px) {
+  /* Hero Section Mobile */
+  .hero-section {
+    min-height: 100vh;
+    padding: 1rem 0.5rem;
+  }
+
+  /* Button adjustments for mobile */
+  .btn-primary,
+  .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    width: 100%;
+    max-width: 280px;
+  }
+
+  /* Services Section Mobile */
+  .services-section {
+    padding: 2rem 0.5rem !important;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Contact Section Mobile */
+  .contact-section {
+    padding: 2rem 0.5rem !important;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Map height adjustment for mobile */
+  .contact-section iframe {
+    height: 300px !important;
+    min-height: 300px;
+  }
+
+  /* Footer Mobile */
+  .footer-section {
+    padding: 2rem 1rem;
+    margin-top: 2rem;
+  }
+
+  /* Modal adjustments for mobile */
+  .modal-content {
+    margin: 0.5rem;
+    max-height: 95vh;
+  }
+
+  /* Section separator mobile */
+  .section-separator {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Contact info cards mobile */
+  .contact-section .rounded-2xl {
+    padding: 1.5rem !important;
+  }
+
+  /* Service cards mobile */
+  .services-section .rounded-2xl {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Tablet adjustments */
+  .services-section,
+  .contact-section {
+    padding: 4rem 1.5rem !important;
+  }
 }
 
