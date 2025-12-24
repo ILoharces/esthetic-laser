@@ -3,6 +3,11 @@ import { MapPin, Phone, Mail, Clock, X } from 'lucide-react';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
 import pricesData from './resources/pricesDepilacion.json';
 
+// Import local images
+import presoterapiaImg from './resources/presoterapia.jpg';
+import oferta1Img from './resources/oferta1.jpg';
+import hydrafaceImg from './resources/hydraface.jpg';
+
 export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPresoterapiaModalOpen, setIsPresoterapiaModalOpen] = useState(false);
@@ -19,7 +24,7 @@ export default function App() {
       id: 2,
       title: 'Presoterapia',
       description: 'Tratamiento de drenaje linfático que mejora la circulación, reduce la retención de líquidos y combate la celulitis de forma natural.',
-      image: 'src/app/resources/presoterapia.jpg',
+      image: presoterapiaImg,
     },
     {
       id: 3,
@@ -331,7 +336,7 @@ export default function App() {
             <div className="p-6">
               <div className="flex justify-center">
                 <ImageWithFallback
-                  src="/src/app/resources/oferta1.jpg"
+                  src={oferta1Img}
                   alt="Presoterapia"
                   className="max-w-full h-auto rounded-lg"
                 />
@@ -379,7 +384,7 @@ export default function App() {
             <div className="p-6">
               <div className="flex justify-center">
                 <ImageWithFallback
-                  src="/src/app/resources/hydraface.jpg"
+                  src={hydrafaceImg}
                   alt="Hydroface"
                   className="max-w-full h-auto rounded-lg"
                 />
