@@ -5,8 +5,8 @@ import pricesData from './resources/pricesDepilacion.json';
 
 // Import local images
 import presoterapiaImg from './resources/presoterapia.jpg';
-import oferta1Img from './resources/oferta1.jpg';
-import hydrafaceImg from './resources/hydraface.jpg';
+import oferta1Img from './resources/oferta1.jpeg';
+import hydrafaceImg from './resources/hydraface.jpeg';
 
 export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
