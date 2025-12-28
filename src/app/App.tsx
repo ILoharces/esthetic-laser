@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { MapPin, Phone, Mail, Clock, X } from 'lucide-react';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
 import pricesData from './resources/pricesDepilacion.json';
-
 // Import local images
 import presoterapiaImg from './resources/presoterapia.jpg';
 import oferta1Img from './resources/oferta1.jpeg';
@@ -12,7 +11,9 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPresoterapiaModalOpen, setIsPresoterapiaModalOpen] = useState(false);
   const [isHydrofaceModalOpen, setIsHydrofaceModalOpen] = useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'chico' | 'chica'>('chica');
+  
   const services = [
     {
       id: 1,
@@ -54,7 +55,10 @@ export default function App() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
-            <button className="btn-primary w-full sm:w-auto">
+            <button 
+              className="btn-primary w-full sm:w-auto"
+              onClick={() => setIsBookingModalOpen(true)}
+            >
               Reservar Cita
             </button>
             <button 
@@ -193,7 +197,10 @@ export default function App() {
                   </div>
                 </div>
 
-                <button className="mt-6 sm:mt-8 md:mt-10 w-full btn-primary">
+                <button 
+                  className="mt-6 sm:mt-8 md:mt-10 w-full btn-primary"
+                  onClick={() => setIsBookingModalOpen(true)}
+                >
                   Reservar Cita
                 </button>
               </div>
@@ -399,6 +406,115 @@ export default function App() {
               >
                 Cerrar
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Reserva de Cita */}
+      {isBookingModalOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+          onClick={() => setIsBookingModalOpen(false)}
+        >
+          <div 
+            className="relative w-full max-w-2xl max-h-[95vh] overflow-y-auto rounded-2xl shadow-2xl m-4 sm:m-6 p-6 sm:p-8 md:p-10"
+            style={{ backgroundColor: 'var(--color-secondary)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header del Modal */}
+            <div className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
+              <h2 className="text-2xl font-bold text-foreground">Reservar Cita</h2>
+              <button
+                onClick={() => setIsBookingModalOpen(false)}
+                className="p-2 rounded-full hover:bg-primary/10 transition-colors"
+                aria-label="Cerrar"
+              >
+                <X className="w-6 h-6 text-foreground" />
+              </button>
+            </div>
+
+            <div className="px-6 sm:px-8 md:px-10 py-8 sm:py-10 md:py-12 space-y-8 sm:space-y-10 md:space-y-12">
+              {/* Sección de contacto */}
+              <div className="text-center space-y-4">
+                <p className="text-base sm:text-lg md:text-xl text-foreground font-semibold leading-relaxed">
+                  Para reservar tu cita, llámanos al <span className="text-primary font-bold">682 19 35 35</span> o escríbenos a <span className="text-primary font-bold">info@yoliestheticlaser.com</span>.
+                </p>
+                <p className="text-sm sm:text-base text-muted-foreground">Te ayudaremos a elegir el mejor tratamiento y horario para ti.</p>
+              </div>
+
+              {/* Sección de Depilación Láser */}
+              <div className="p-6 sm:p-7 md:p-8 rounded-xl border border-primary/15 bg-primary/5 space-y-6 shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-primary/10">
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">Depilación Láser</h3>
+                  <span className="text-sm sm:text-base text-primary font-medium">Bonos mujer y hombre</span>
+                </div>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="space-y-4">
+                    <div className="text-sm uppercase tracking-wide text-muted-foreground font-semibold mb-3">Packs Chica</div>
+                    {pricesData.packBonosChica.map((pack, packIndex) => (
+                      <div key={`chica-${packIndex}`} className="rounded-lg border border-primary/10 bg-white/40 px-5 py-4 space-y-3 shadow-sm">
+                        <div className="font-semibold text-foreground text-base">{pack.zona}</div>
+                        <div className="space-y-2 pt-1">
+                          {pack.opciones.map((opcion, opcionIndex) => (
+                            <div key={`chica-${packIndex}-${opcionIndex}`} className="flex items-center justify-between text-sm text-foreground/80 py-1">
+                              <span>{opcion.sesiones} sesión(es)</span>
+                              <span className="font-semibold text-primary">€{opcion.precioFinal}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="text-sm uppercase tracking-wide text-muted-foreground font-semibold mb-3">Packs Chico</div>
+                    {pricesData.packBonosChico.map((pack, packIndex) => (
+                      <div key={`chico-${packIndex}`} className="rounded-lg border border-primary/10 bg-white/40 px-5 py-4 space-y-3 shadow-sm">
+                        <div className="font-semibold text-foreground text-base">{pack.zona}</div>
+                        <div className="space-y-2 pt-1">
+                          {pack.opciones.map((opcion, opcionIndex) => (
+                            <div key={`chico-${packIndex}-${opcionIndex}`} className="flex items-center justify-between text-sm text-foreground/80 py-1">
+                              <span>{opcion.sesiones} sesión(es)</span>
+                              <span className="font-semibold text-primary">€{opcion.precioFinal}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Sección de otros servicios */}
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="p-6 sm:p-7 md:p-8 rounded-xl border border-primary/15 bg-white/50 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-primary/10">
+                    <h3 className="text-lg sm:text-xl font-semibold text-foreground">Presoterapia</h3>
+                    <span className="text-primary font-bold text-lg sm:text-xl">€120</span>
+                  </div>
+                  <p className="text-sm sm:text-base text-muted-foreground pt-1">Bono de 10 sesiones. Mejora la circulación y alivia la retención de líquidos.</p>
+                </div>
+                <div className="p-6 sm:p-7 md:p-8 rounded-xl border border-primary/15 bg-white/50 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between pb-2 border-b border-primary/10">
+                    <h3 className="text-lg sm:text-xl font-semibold text-foreground">Hydroface</h3>
+                    <span className="text-primary font-bold text-lg sm:text-xl">€49</span>
+                  </div>
+                  <p className="text-sm sm:text-base text-muted-foreground pt-1">1 sesión de limpieza profunda e hidratación para una piel luminosa.</p>
+                </div>
+              </div>
+
+              {/* Botón de cerrar */}
+              <div className="flex justify-center pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsBookingModalOpen(false)}
+                  className="btn-primary px-8 py-3 text-base sm:text-lg"
+                >
+                  Cerrar
+                </button>
+              </div>
             </div>
           </div>
         </div>
