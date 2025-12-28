@@ -414,51 +414,51 @@ export default function App() {
       {/* Modal de Reserva de Cita */}
       {isBookingModalOpen && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
           onClick={() => setIsBookingModalOpen(false)}
         >
           <div 
-            className="relative w-full max-w-2xl max-h-[95vh] overflow-y-auto rounded-2xl shadow-2xl m-4 sm:m-6 p-6 sm:p-8 md:p-10"
+            className="relative w-full max-w-2xl my-2 sm:my-4 max-h-[calc(100vh-1rem)] sm:max-h-[95vh] overflow-y-auto rounded-2xl shadow-2xl"
             style={{ backgroundColor: 'var(--color-secondary)' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header del Modal */}
-            <div className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 md:px-8 py-4 sm:py-5 md:py-6 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <h2 className="text-2xl font-bold text-foreground">Reservar Cita</h2>
+            <div className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground">Reservar Cita</h2>
               <button
                 onClick={() => setIsBookingModalOpen(false)}
                 className="p-2 rounded-full hover:bg-primary/10 transition-colors"
                 aria-label="Cerrar"
               >
-                <X className="w-6 h-6 text-foreground" />
+                <X className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
               </button>
             </div>
 
-            <div className="px-6 sm:px-8 md:px-10 py-8 sm:py-10 md:py-12 space-y-8 sm:space-y-10 md:space-y-12">
+            <div className="px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:py-8 lg:py-10 space-y-5 sm:space-y-6 md:space-y-8 lg:space-y-10">
               {/* Sección de contacto */}
-              <div className="text-center space-y-4">
-                <p className="text-base sm:text-lg md:text-xl text-foreground font-semibold leading-relaxed">
-                  Para reservar tu cita, llámanos al <span className="text-primary font-bold">682 19 35 35</span> o escríbenos a <span className="text-primary font-bold">info@yoliestheticlaser.com</span>.
+              <div className="text-center space-y-3 sm:space-y-4">
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-foreground font-semibold leading-relaxed px-2">
+                  Para reservar tu cita, llámanos al <span className="text-primary font-bold">682 19 35 35</span> o escríbenos a <span className="text-primary font-bold break-all">info@yoliestheticlaser.com</span>.
                 </p>
-                <p className="text-sm sm:text-base text-muted-foreground">Te ayudaremos a elegir el mejor tratamiento y horario para ti.</p>
+                <p className="text-xs sm:text-sm md:text-base text-muted-foreground px-2">Te ayudaremos a elegir el mejor tratamiento y horario para ti.</p>
               </div>
 
               {/* Sección de Depilación Láser */}
-              <div className="p-6 sm:p-7 md:p-8 rounded-xl border border-primary/15 bg-primary/5 space-y-6 shadow-sm">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 border-b border-primary/10">
-                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">Depilación Láser</h3>
-                  <span className="text-sm sm:text-base text-primary font-medium">Bonos mujer y hombre</span>
+              <div className="p-4 sm:p-5 md:p-6 lg:p-8 rounded-xl border border-primary/15 bg-primary/5 space-y-4 sm:space-y-5 md:space-y-6 shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 pb-2 border-b border-primary/10">
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Depilación Láser</h3>
+                  <span className="text-xs sm:text-sm md:text-base text-primary font-medium">Bonos mujer y hombre</span>
                 </div>
-                <div className="grid gap-6 md:grid-cols-2">
-                  <div className="space-y-4">
-                    <div className="text-sm uppercase tracking-wide text-muted-foreground font-semibold mb-3">Packs Chica</div>
+                <div className="grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-2">
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="text-xs sm:text-sm uppercase tracking-wide text-muted-foreground font-semibold mb-2 sm:mb-3">Packs Chica</div>
                     {pricesData.packBonosChica.map((pack, packIndex) => (
-                      <div key={`chica-${packIndex}`} className="rounded-lg border border-primary/10 bg-white/40 px-5 py-4 space-y-3 shadow-sm">
-                        <div className="font-semibold text-foreground text-base">{pack.zona}</div>
-                        <div className="space-y-2 pt-1">
+                      <div key={`chica-${packIndex}`} className="rounded-lg border border-primary/10 bg-white/40 px-3 sm:px-4 md:px-5 py-3 sm:py-4 space-y-2 sm:space-y-3 shadow-sm">
+                        <div className="font-semibold text-foreground text-sm sm:text-base">{pack.zona}</div>
+                        <div className="space-y-1.5 sm:space-y-2 pt-1">
                           {pack.opciones.map((opcion, opcionIndex) => (
-                            <div key={`chica-${packIndex}-${opcionIndex}`} className="flex items-center justify-between text-sm text-foreground/80 py-1">
+                            <div key={`chica-${packIndex}-${opcionIndex}`} className="flex items-center justify-between text-xs sm:text-sm text-foreground/80 py-0.5 sm:py-1">
                               <span>{opcion.sesiones} sesión(es)</span>
                               <span className="font-semibold text-primary">€{opcion.precioFinal}</span>
                             </div>
@@ -468,14 +468,14 @@ export default function App() {
                     ))}
                   </div>
 
-                  <div className="space-y-4">
-                    <div className="text-sm uppercase tracking-wide text-muted-foreground font-semibold mb-3">Packs Chico</div>
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="text-xs sm:text-sm uppercase tracking-wide text-muted-foreground font-semibold mb-2 sm:mb-3">Packs Chico</div>
                     {pricesData.packBonosChico.map((pack, packIndex) => (
-                      <div key={`chico-${packIndex}`} className="rounded-lg border border-primary/10 bg-white/40 px-5 py-4 space-y-3 shadow-sm">
-                        <div className="font-semibold text-foreground text-base">{pack.zona}</div>
-                        <div className="space-y-2 pt-1">
+                      <div key={`chico-${packIndex}`} className="rounded-lg border border-primary/10 bg-white/40 px-3 sm:px-4 md:px-5 py-3 sm:py-4 space-y-2 sm:space-y-3 shadow-sm">
+                        <div className="font-semibold text-foreground text-sm sm:text-base">{pack.zona}</div>
+                        <div className="space-y-1.5 sm:space-y-2 pt-1">
                           {pack.opciones.map((opcion, opcionIndex) => (
-                            <div key={`chico-${packIndex}-${opcionIndex}`} className="flex items-center justify-between text-sm text-foreground/80 py-1">
+                            <div key={`chico-${packIndex}-${opcionIndex}`} className="flex items-center justify-between text-xs sm:text-sm text-foreground/80 py-0.5 sm:py-1">
                               <span>{opcion.sesiones} sesión(es)</span>
                               <span className="font-semibold text-primary">€{opcion.precioFinal}</span>
                             </div>
@@ -488,29 +488,29 @@ export default function App() {
               </div>
 
               {/* Sección de otros servicios */}
-              <div className="grid gap-6 md:grid-cols-2">
-                <div className="p-6 sm:p-7 md:p-8 rounded-xl border border-primary/15 bg-white/50 shadow-sm space-y-3">
+              <div className="grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-2">
+                <div className="p-4 sm:p-5 md:p-6 lg:p-8 rounded-xl border border-primary/15 bg-white/50 shadow-sm space-y-2 sm:space-y-3">
                   <div className="flex items-center justify-between pb-2 border-b border-primary/10">
-                    <h3 className="text-lg sm:text-xl font-semibold text-foreground">Presoterapia</h3>
-                    <span className="text-primary font-bold text-lg sm:text-xl">€120</span>
+                    <h3 className="text-base sm:text-lg md:text-xl font-semibold text-foreground">Presoterapia</h3>
+                    <span className="text-primary font-bold text-base sm:text-lg md:text-xl">€120</span>
                   </div>
-                  <p className="text-sm sm:text-base text-muted-foreground pt-1">Bono de 10 sesiones. Mejora la circulación y alivia la retención de líquidos.</p>
+                  <p className="text-xs sm:text-sm md:text-base text-muted-foreground pt-1">Bono de 10 sesiones. Mejora la circulación y alivia la retención de líquidos.</p>
                 </div>
-                <div className="p-6 sm:p-7 md:p-8 rounded-xl border border-primary/15 bg-white/50 shadow-sm space-y-3">
+                <div className="p-4 sm:p-5 md:p-6 lg:p-8 rounded-xl border border-primary/15 bg-white/50 shadow-sm space-y-2 sm:space-y-3">
                   <div className="flex items-center justify-between pb-2 border-b border-primary/10">
-                    <h3 className="text-lg sm:text-xl font-semibold text-foreground">Hydroface</h3>
-                    <span className="text-primary font-bold text-lg sm:text-xl">€49</span>
+                    <h3 className="text-base sm:text-lg md:text-xl font-semibold text-foreground">Hydroface</h3>
+                    <span className="text-primary font-bold text-base sm:text-lg md:text-xl">€49</span>
                   </div>
-                  <p className="text-sm sm:text-base text-muted-foreground pt-1">1 sesión de limpieza profunda e hidratación para una piel luminosa.</p>
+                  <p className="text-xs sm:text-sm md:text-base text-muted-foreground pt-1">1 sesión de limpieza profunda e hidratación para una piel luminosa.</p>
                 </div>
               </div>
 
               {/* Botón de cerrar */}
-              <div className="flex justify-center pt-4">
+              <div className="flex justify-center pt-2 sm:pt-3 md:pt-4 pb-2">
                 <button
                   type="button"
                   onClick={() => setIsBookingModalOpen(false)}
-                  className="btn-primary px-8 py-3 text-base sm:text-lg"
+                  className="btn-primary px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg w-full sm:w-auto"
                 >
                   Cerrar
                 </button>
