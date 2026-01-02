@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MapPin, Phone, Mail, Clock, X } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
 import pricesData from './resources/pricesDepilacion.json';
 // Import local images
@@ -13,7 +14,129 @@ export default function App() {
   const [isHydrofaceModalOpen, setIsHydrofaceModalOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'chico' | 'chica'>('chica');
-  
+
+  // Form state
+  const [formData, setFormData] = useState({
+    fullName: '',
+    contactType: 'email' as 'email' | 'phone',
+    email: '',
+    phone: '',
+    selectedServices: [] as string[],
+    depilacionSelections: [] as Array<{ tipo: 'chica' | 'chico', zona: string, sesiones: number, precio: number }>,
+  });
+
+  // Email sending state
+  const [isSending, setIsSending] = useState(false);
+  const [sendStatus, setSendStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  // Función para formatear las selecciones de depilación
+  const formatDepilacionSelections = () => {
+    if (formData.depilacionSelections.length === 0) return 'Ninguna selección';
+
+    const grouped = formData.depilacionSelections.reduce((acc, sel) => {
+      const key = `${sel.tipo}-${sel.zona}`;
+      if (!acc[key]) {
+        acc[key] = { tipo: sel.tipo, zona: sel.zona, opciones: [] };
+      }
+      acc[key].opciones.push(`${sel.sesiones} sesión${sel.sesiones > 1 ? 'es' : ''} - €${sel.precio}`);
+      return acc;
+    }, {} as Record<string, { tipo: string, zona: string, opciones: string[] }>);
+
+    return Object.values(grouped).map(group => {
+      const tipoLabel = group.tipo === 'chica' ? 'Pack Bonos Chica' : 'Pack Bonos Chico';
+      return `${tipoLabel} - ${group.zona}:\n${group.opciones.join(', ')}`;
+    }).join('\n\n');
+  };
+
+  // Función para enviar el formulario
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSending(true);
+    setSendStatus('idle');
+
+    try {
+      // Formatear los servicios seleccionados
+      const serviciosText = formData.selectedServices.join(', ');
+
+      // Formatear las selecciones de depilación
+      const depilacionText = formData.depilacionSelections.length > 0
+        ? formatDepilacionSelections()
+        : 'Ninguna selección específica';
+
+      // Información de contacto
+      const contacto = formData.contactType === 'email'
+        ? `Email: ${formData.email}`
+        : `Teléfono: ${formData.phone}`;
+
+      // Preparar el mensaje
+      const message = `
+Nueva Reserva de Cita
+
+Nombre completo: ${formData.fullName}
+${contacto}
+
+Servicios seleccionados: ${serviciosText}
+
+${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depilación Láser:\n${depilacionText}` : ''}
+      `.trim();
+
+      // Configuración de EmailJS
+      // NOTA: Configura estas variables de entorno en un archivo .env
+      // VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, VITE_EMAILJS_PUBLIC_KEY
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+      // Validar que las credenciales estén configuradas
+      if (!serviceId || !templateId || !publicKey ||
+        serviceId === 'YOUR_SERVICE_ID' ||
+        templateId === 'YOUR_TEMPLATE_ID' ||
+        publicKey === 'YOUR_PUBLIC_KEY') {
+        throw new Error('Las credenciales de EmailJS no están configuradas. Por favor, configura las variables de entorno VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID y VITE_EMAILJS_PUBLIC_KEY');
+      }
+
+      // Parámetros del template de EmailJS
+      // Asegúrate de que tu template en EmailJS tenga estos campos
+      const templateParams = {
+        to_email: 'info@yoliestheticlaser.com',
+        from_name: formData.fullName,
+        from_email: formData.contactType === 'email' ? formData.email : 'no-email@example.com',
+        phone: formData.contactType === 'phone' ? formData.phone : '',
+        message: message,
+        subject: 'Nueva Reserva de Cita - Esthetic Laser',
+      };
+
+      await emailjs.send(
+        serviceId,
+        templateId,
+        templateParams,
+        publicKey
+      );
+
+      setSendStatus('success');
+
+      // Limpiar el formulario después de 2 segundos
+      setTimeout(() => {
+        setFormData({
+          fullName: '',
+          contactType: 'email',
+          email: '',
+          phone: '',
+          selectedServices: [],
+          depilacionSelections: [],
+        });
+        setSendStatus('idle');
+        setIsBookingModalOpen(false);
+      }, 2000);
+
+    } catch (error) {
+      console.error('Error al enviar el formulario:', error);
+      setSendStatus('error');
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   const services = [
     {
       id: 1,
@@ -50,18 +173,18 @@ export default function App() {
           </h2>
           <div className="w-full flex justify-center px-4">
             <p className="max-w-3xl text-base sm:text-lg text-muted-foreground mb-6 sm:mb-8 leading-relaxed">
-              Descubre nuestros tratamientos de última generación en el corazón de Pamplona. 
+              Descubre nuestros tratamientos de última generación en el corazón de Pamplona.
               Profesionalidad, tecnología avanzada y resultados garantizados.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
-            <button 
+            <button
               className="btn-primary w-full sm:w-auto"
               onClick={() => setIsBookingModalOpen(true)}
             >
               Reservar Cita
             </button>
-            <button 
+            <button
               className="btn-secondary w-full sm:w-auto"
               onClick={() => {
                 document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' });
@@ -110,7 +233,7 @@ export default function App() {
                   <p className="text-sm sm:text-base text-foreground/70 mb-4 sm:mb-6 leading-relaxed min-h-[4.5rem] text-center">
                     {service.description}
                   </p>
-                  <button 
+                  <button
                     className="w-full btn-secondary text-center text-sm sm:text-base"
                     onClick={() => {
                       if (service.id === 1) {
@@ -148,7 +271,7 @@ export default function App() {
             <div className="space-y-6 sm:space-y-8">
               <div className="rounded-2xl p-4 sm:p-6 md:p-10 shadow-xl border border-primary/10 hover:shadow-2xl transition-shadow duration-300" style={{ backgroundColor: 'var(--color-secondary)' }}>
                 <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-6 sm:mb-8 text-center">Información de Contacto</h3>
-                
+
                 <div className="space-y-6 sm:space-y-8">
                   <div className="flex flex-col items-center gap-4 group text-center">
                     <div className="p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl group-hover:from-primary/20 group-hover:to-primary/10 transition-all duration-300">
@@ -197,7 +320,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <button 
+                <button
                   className="mt-6 sm:mt-8 md:mt-10 w-full btn-primary"
                   onClick={() => setIsBookingModalOpen(true)}
                 >
@@ -208,14 +331,14 @@ export default function App() {
 
             {/* Map */}
             <div className="h-[300px] sm:h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-xl border border-primary/10 hover:shadow-2xl transition-shadow duration-300" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2475.9206613749957!2d-1.6816700751958547!3d42.83408244265716!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd508d5e64205763%3A0x2fc35ea8bde0ddeb!2sCtra%20San%20Sebastian%2C%20km%201%2C%2031013%20Pamplona%2C%20Navarra!5e1!3m2!1ses!2ses!4v1765998917418!5m2!1ses!2ses" 
-                width="100%" 
-                height="100%" 
-                style={{border:0}} 
-                allowFullScreen 
-                loading="lazy" 
-                referrerPolicy="no-referrer-when-downgrade" 
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2475.9206613749957!2d-1.6816700751958547!3d42.83408244265716!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd508d5e64205763%3A0x2fc35ea8bde0ddeb!2sCtra%20San%20Sebastian%2C%20km%201%2C%2031013%20Pamplona%2C%20Navarra!5e1!3m2!1ses!2ses!4v1765998917418!5m2!1ses!2ses"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
                 title="Mapa de ubicación - Centro Comercial Eroski, Ctra San Sebastian, km 1, 31013 Pamplona, Navarra"
               />
             </div>
@@ -226,90 +349,61 @@ export default function App() {
       {/* Separator */}
       <div className="section-separator w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
 
-      {/* Modal de Precios de Depilación */}
+      {/* --- MODAL DE PRECIOS DE DEPILACIÓN --- */}
       {isModalOpen && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
           onClick={() => setIsModalOpen(false)}
         >
-          <div 
-            className="relative w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-2xl shadow-2xl m-2 sm:m-4"
+          <div
+            className="relative w-full max-w-4xl max-h-[85vh] flex flex-col rounded-3xl shadow-2xl overflow-hidden"
             style={{ backgroundColor: 'var(--color-secondary)' }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header del Modal */}
-            <div className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 py-4 sm:py-6 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground ml-1 sm:ml-2 md:ml-4 pr-2">Precios de Depilación Láser</h2>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="p-2 rounded-full hover:bg-primary/10 transition-colors"
-                aria-label="Cerrar"
-              >
-                <X className="w-6 h-6 text-foreground" />
+            {/* Header Fijo */}
+            <div className="flex items-center justify-between px-6 py-5 sm:px-10 sm:py-7 border-b border-primary/10">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground">Precios de Depilación Láser</h2>
+              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-primary/10 rounded-full transition-colors">
+                <X className="w-6 h-6" />
               </button>
             </div>
 
-            {/* Contenido del Modal */}
-            <div className="px-2 sm:px-4 md:px-8 py-4 sm:py-6">
-              {/* Tabs */}
-              <div className="flex my-4 sm:my-6 border-b border-primary/20 mx-2 sm:mx-4 md:mx-6">
+            {/* Contenido con Scroll y Padding Interno */}
+            <div className="flex-1 overflow-y-auto p-6 sm:p-10">
+              <div className="flex gap-4 border-b border-primary/10 mb-8">
                 <button
                   onClick={() => setActiveTab('chica')}
-                  className={`flex-1 px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-5 md:py-6 lg:py-7 text-sm sm:text-base md:text-lg font-semibold transition-colors border-b-2 text-center ${
-                    activeTab === 'chica'
-                      ? 'text-primary border-primary'
-                      : 'text-muted-foreground border-transparent hover:text-foreground'
-                  }`}
+                  className={`flex-1 pb-4 font-semibold border-b-2 transition-colors ${activeTab === 'chica' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'}`}
                 >
                   Pack Bonos Chica
                 </button>
                 <button
                   onClick={() => setActiveTab('chico')}
-                  className={`flex-1 px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-5 md:py-6 lg:py-7 text-sm sm:text-base md:text-lg font-semibold transition-colors border-b-2 text-center ${
-                    activeTab === 'chico'
-                      ? 'text-primary border-primary'
-                      : 'text-muted-foreground border-transparent hover:text-foreground'
-                  }`}
+                  className={`flex-1 pb-4 font-semibold border-b-2 transition-colors ${activeTab === 'chico' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'}`}
                 >
                   Pack Bonos Chico
                 </button>
               </div>
 
-              {/* Contenido de las tabs */}
-              <div className="ml-1 sm:ml-2 md:ml-4 mr-1 sm:mr-2 md:mr-4">
-                <div className="rounded-xl p-3 sm:p-4 md:p-6 lg:p-8" style={{ backgroundColor: 'var(--color-secondary)' }}>
-                  {(activeTab === 'chico' ? pricesData.packBonosChico : pricesData.packBonosChica).map((pack, index) => (
-                    <div key={index} className={`my-4 sm:my-6 md:my-8 ${index > 0 ? "pt-6 sm:pt-8 md:pt-12 border-t border-foreground/10" : "pt-0"}`}>
-                      <h4 className="text-sm sm:text-base md:text-lg font-semibold text-foreground mb-4 sm:mb-6">{pack.zona}</h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5">
-                        {pack.opciones.map((opcion, opcionIndex) => (
-                          <div key={opcionIndex} className="rounded-lg p-3 sm:p-4 md:p-5 lg:p-6 text-center" style={{ backgroundColor: 'var(--color-secondary)' }}>
-                            <div className="text-xs sm:text-sm font-medium text-muted-foreground mb-3 sm:mb-4">{opcion.sesiones} sesión{opcion.sesiones > 1 ? 'es' : ''}</div>
-                            <div className="mb-3 sm:mb-4">
-                              <span className="text-xs text-muted-foreground line-through">€{opcion.precioOriginal}</span>
-                              <span className="text-lg sm:text-xl font-bold text-primary ml-2">€{opcion.precioFinal}</span>
-                            </div>
-                            <div className="inline-block px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-semibold text-primary" style={{ backgroundColor: 'rgba(236, 72, 153, 0.15)' }}>
-                              -{opcion.descuento}%
-                            </div>
+              <div className="grid grid-cols-1 gap-8">
+                {(activeTab === 'chico' ? pricesData.packBonosChico : pricesData.packBonosChica).map((pack, index) => (
+                  <div key={index} className="space-y-4">
+                    <h4 className="text-lg font-bold text-primary">{pack.zona}</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {pack.opciones.map((opcion, i) => (
+                        <div key={i} className="p-5 rounded-2xl bg-primary/5 border border-primary/10 text-center">
+                          <p className="text-sm text-muted-foreground mb-1">{opcion.sesiones} sesiones</p>
+                          <div className="flex items-center justify-center gap-2">
+                            <span className="text-xs line-through opacity-50">€{opcion.precioOriginal}</span>
+                            <span className="text-xl font-bold text-foreground">€{opcion.precioFinal}</span>
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
-            </div>
-
-            {/* Footer del Modal */}
-            <div className="sticky bottom-0 px-3 sm:px-4 md:px-8 py-4 sm:py-5 md:py-6 border-t border-primary/20 flex justify-end" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <button 
-                className="btn-primary text-sm sm:text-base"
-                onClick={() => setIsModalOpen(false)}
-              >
-                Cerrar
-              </button>
             </div>
           </div>
         </div>
@@ -317,19 +411,19 @@ export default function App() {
 
       {/* Modal de Presoterapia */}
       {isPresoterapiaModalOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
           onClick={() => setIsPresoterapiaModalOpen(false)}
         >
-          <div 
+          <div
             className="relative w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-2xl shadow-2xl m-2 sm:m-4"
             style={{ backgroundColor: 'var(--color-secondary)' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header del Modal */}
-            <div className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 py-4 sm:py-6 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground ml-1 sm:ml-2 md:ml-4 pr-2">Presoterapia</h2>
+            <div className="sticky top-0 z-10 flex items-center justify-between px-6 sm:px-8 md:px-10 py-5 sm:py-6 md:py-7 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
+              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground pr-2">Presoterapia</h2>
               <button
                 onClick={() => setIsPresoterapiaModalOpen(false)}
                 className="p-2 rounded-full hover:bg-primary/10 transition-colors"
@@ -340,7 +434,7 @@ export default function App() {
             </div>
 
             {/* Contenido del Modal */}
-            <div className="p-3 sm:p-4 md:p-6">
+            <div className="px-6 sm:px-8 md:px-10 lg:px-12 py-6 sm:py-8 md:py-10">
               <div className="flex justify-center">
                 <ImageWithFallback
                   src={oferta1Img}
@@ -351,8 +445,8 @@ export default function App() {
             </div>
 
             {/* Footer del Modal */}
-            <div className="sticky bottom-0 px-3 sm:px-4 md:px-8 py-4 sm:py-5 md:py-6 border-t border-primary/20 flex justify-end" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <button 
+            <div className="sticky bottom-0 px-6 sm:px-8 md:px-10 lg:px-12 py-5 sm:py-6 md:py-7 border-t border-primary/20 flex justify-end" style={{ backgroundColor: 'var(--color-secondary)' }}>
+              <button
                 className="btn-primary text-sm sm:text-base"
                 onClick={() => setIsPresoterapiaModalOpen(false)}
               >
@@ -365,19 +459,19 @@ export default function App() {
 
       {/* Modal de Hydroface */}
       {isHydrofaceModalOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
           onClick={() => setIsHydrofaceModalOpen(false)}
         >
-          <div 
+          <div
             className="relative w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-2xl shadow-2xl m-2 sm:m-4"
             style={{ backgroundColor: 'var(--color-secondary)' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header del Modal */}
-            <div className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 py-4 sm:py-6 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground ml-1 sm:ml-2 md:ml-4 pr-2">Hydroface</h2>
+            <div className="sticky top-0 z-10 flex items-center justify-between px-6 sm:px-8 md:px-10 py-5 sm:py-6 md:py-7 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
+              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground pr-2">Hydroface</h2>
               <button
                 onClick={() => setIsHydrofaceModalOpen(false)}
                 className="p-2 rounded-full hover:bg-primary/10 transition-colors"
@@ -388,7 +482,7 @@ export default function App() {
             </div>
 
             {/* Contenido del Modal */}
-            <div className="p-3 sm:p-4 md:p-6">
+            <div className="px-6 sm:px-8 md:px-10 lg:px-12 py-6 sm:py-8 md:py-10">
               <div className="flex justify-center">
                 <ImageWithFallback
                   src={hydrafaceImg}
@@ -399,8 +493,8 @@ export default function App() {
             </div>
 
             {/* Footer del Modal */}
-            <div className="sticky bottom-0 px-3 sm:px-4 md:px-8 py-4 sm:py-5 md:py-6 border-t border-primary/20 flex justify-end" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <button 
+            <div className="sticky bottom-0 px-6 sm:px-8 md:px-10 lg:px-12 py-5 sm:py-6 md:py-7 border-t border-primary/20 flex justify-end" style={{ backgroundColor: 'var(--color-secondary)' }}>
+              <button
                 className="btn-primary text-sm sm:text-base"
                 onClick={() => setIsHydrofaceModalOpen(false)}
               >
@@ -413,18 +507,18 @@ export default function App() {
 
       {/* Modal de Reserva de Cita */}
       {isBookingModalOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
           onClick={() => setIsBookingModalOpen(false)}
         >
-          <div 
+          <div
             className="relative w-full max-w-2xl my-2 sm:my-4 max-h-[calc(100vh-1rem)] sm:max-h-[95vh] overflow-y-auto rounded-2xl shadow-2xl"
             style={{ backgroundColor: 'var(--color-secondary)' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header del Modal */}
-            <div className="sticky top-0 z-10 flex items-center justify-between px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
+            <div className="sticky top-0 z-10 flex items-center justify-between px-6 sm:px-8 md:px-10 lg:px-12 py-5 sm:py-6 md:py-7 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
               <h2 className="text-xl sm:text-2xl font-bold text-foreground">Reservar Cita</h2>
               <button
                 onClick={() => setIsBookingModalOpen(false)}
@@ -435,87 +529,310 @@ export default function App() {
               </button>
             </div>
 
-            <div className="px-4 sm:px-6 md:px-8 lg:px-10 py-4 sm:py-6 md:py-8 lg:py-10 space-y-5 sm:space-y-6 md:space-y-8 lg:space-y-10">
-              {/* Sección de contacto */}
-              <div className="text-center space-y-3 sm:space-y-4">
-                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-foreground font-semibold leading-relaxed px-2">
-                  Para reservar tu cita, llámanos al <span className="text-primary font-bold">682 19 35 35</span> o escríbenos a <span className="text-primary font-bold break-all">info@yoliestheticlaser.com</span>.
-                </p>
-                <p className="text-xs sm:text-sm md:text-base text-muted-foreground px-2">Te ayudaremos a elegir el mejor tratamiento y horario para ti.</p>
+            <form
+              className="px-6 sm:px-8 md:px-10 lg:px-12 py-6 sm:py-8 md:py-10 space-y-5 sm:space-y-6"
+              onSubmit={handleSubmit}
+            >
+              {/* Campo Nombre Completo */}
+              <div className="space-y-2">
+                <label htmlFor="fullName" className="block text-sm sm:text-base font-semibold text-foreground">
+                  Nombre completo *
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  required
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  className="w-full px-4 py-2.5 sm:py-3 rounded-lg border border-primary/20 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                  style={{ backgroundColor: 'var(--color-secondary)' }}
+                  placeholder="Ingresa tu nombre completo"
+                />
               </div>
 
-              {/* Sección de Depilación Láser */}
-              <div className="p-4 sm:p-5 md:p-6 lg:p-8 rounded-xl border border-primary/15 bg-primary/5 space-y-4 sm:space-y-5 md:space-y-6 shadow-sm">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 pb-2 border-b border-primary/10">
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Depilación Láser</h3>
-                  <span className="text-xs sm:text-sm md:text-base text-primary font-medium">Bonos mujer y hombre</span>
+              {/* Selección de tipo de contacto */}
+              <div className="space-y-2">
+                <label className="block text-sm sm:text-base font-semibold text-foreground mb-3">
+                  Contacto *
+                </label>
+                <div className="flex gap-4 mb-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="contactType"
+                      value="email"
+                      checked={formData.contactType === 'email'}
+                      onChange={() => setFormData({ ...formData, contactType: 'email', phone: '' })}
+                      className="w-4 h-4 text-primary focus:ring-primary"
+                    />
+                    <span className="text-sm sm:text-base text-foreground">Correo electrónico</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="contactType"
+                      value="phone"
+                      checked={formData.contactType === 'phone'}
+                      onChange={() => setFormData({ ...formData, contactType: 'phone', email: '' })}
+                      className="w-4 h-4 text-primary focus:ring-primary"
+                    />
+                    <span className="text-sm sm:text-base text-foreground">Teléfono</span>
+                  </label>
                 </div>
-                <div className="grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-2">
-                  <div className="space-y-3 sm:space-y-4">
-                    <div className="text-xs sm:text-sm uppercase tracking-wide text-muted-foreground font-semibold mb-2 sm:mb-3">Packs Chica</div>
-                    {pricesData.packBonosChica.map((pack, packIndex) => (
-                      <div key={`chica-${packIndex}`} className="rounded-lg border border-primary/10 bg-white/40 px-3 sm:px-4 md:px-5 py-3 sm:py-4 space-y-2 sm:space-y-3 shadow-sm">
-                        <div className="font-semibold text-foreground text-sm sm:text-base">{pack.zona}</div>
-                        <div className="space-y-1.5 sm:space-y-2 pt-1">
-                          {pack.opciones.map((opcion, opcionIndex) => (
-                            <div key={`chica-${packIndex}-${opcionIndex}`} className="flex items-center justify-between text-xs sm:text-sm text-foreground/80 py-0.5 sm:py-1">
-                              <span>{opcion.sesiones} sesión(es)</span>
-                              <span className="font-semibold text-primary">€{opcion.precioFinal}</span>
+
+                {/* Campo Email o Teléfono */}
+                {formData.contactType === 'email' ? (
+                  <input
+                    type="email"
+                    id="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-4 py-2.5 sm:py-3 rounded-lg border border-primary/20 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                    style={{ backgroundColor: 'var(--color-secondary)' }}
+                    placeholder="correo@ejemplo.com"
+                  />
+                ) : (
+                  <input
+                    type="tel"
+                    id="phone"
+                    required
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-4 py-2.5 sm:py-3 rounded-lg border border-primary/20 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                    style={{ backgroundColor: 'var(--color-secondary)' }}
+                    placeholder="682 19 35 35"
+                  />
+                )}
+              </div>
+
+              {/* Selección de Servicios */}
+              <div className="space-y-3">
+                <label className="block text-sm sm:text-base font-semibold text-foreground">
+                  Servicios disponibles *
+                </label>
+                <div className="space-y-3">
+                  {/* Depilación Láser con opciones del JSON */}
+                  <div className="rounded-lg border border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
+                    <label className="flex items-start gap-3 p-4 cursor-pointer hover:bg-primary/5 transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={formData.selectedServices.includes('Depilación Láser')}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData({
+                              ...formData,
+                              selectedServices: [...formData.selectedServices, 'Depilación Láser']
+                            });
+                          } else {
+                            setFormData({
+                              ...formData,
+                              selectedServices: formData.selectedServices.filter(s => s !== 'Depilación Láser'),
+                              depilacionSelections: []
+                            });
+                          }
+                        }}
+                        className="mt-1 w-4 h-4 text-primary focus:ring-primary"
+                      />
+                      <div className="flex-1">
+                        <span className="text-sm sm:text-base font-medium text-foreground">Depilación Láser</span>
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-1">Tecnología de última generación para una depilación definitiva</p>
+                      </div>
+                    </label>
+
+                    {/* Opciones de Depilación cuando está seleccionado */}
+                    {formData.selectedServices.includes('Depilación Láser') && (
+                      <div className="px-4 pb-4 space-y-4 border-t border-primary/10 pt-4">
+                        {/* Pack Bonos Chica */}
+                        <div className="space-y-3">
+                          <h4 className="text-xs sm:text-sm uppercase tracking-wide text-muted-foreground font-semibold">Pack Bonos Chica</h4>
+                          {pricesData.packBonosChica.map((pack, packIndex) => (
+                            <div key={`chica-${packIndex}`} className="space-y-2">
+                              <div className="text-sm font-medium text-foreground">{pack.zona}</div>
+                              <div className="space-y-2 pl-4">
+                                {pack.opciones.map((opcion, opcionIndex) => {
+                                  const selectionKey = `chica-${packIndex}-${opcionIndex}`;
+                                  const isSelected = formData.depilacionSelections.some(
+                                    s => s.tipo === 'chica' && s.zona === pack.zona && s.sesiones === opcion.sesiones
+                                  );
+                                  return (
+                                    <label key={selectionKey} className="flex items-center gap-3 cursor-pointer">
+                                      <input
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        onChange={(e) => {
+                                          if (e.target.checked) {
+                                            setFormData({
+                                              ...formData,
+                                              depilacionSelections: [
+                                                ...formData.depilacionSelections,
+                                                { tipo: 'chica', zona: pack.zona, sesiones: opcion.sesiones, precio: opcion.precioFinal }
+                                              ]
+                                            });
+                                          } else {
+                                            setFormData({
+                                              ...formData,
+                                              depilacionSelections: formData.depilacionSelections.filter(
+                                                s => !(s.tipo === 'chica' && s.zona === pack.zona && s.sesiones === opcion.sesiones)
+                                              )
+                                            });
+                                          }
+                                        }}
+                                        className="w-4 h-4 text-primary focus:ring-primary"
+                                      />
+                                      <span className="text-xs sm:text-sm text-foreground">
+                                        {opcion.sesiones} sesión{opcion.sesiones > 1 ? 'es' : ''} - €{opcion.precioFinal}
+                                      </span>
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Pack Bonos Chico */}
+                        <div className="space-y-3 pt-4 border-t border-primary/10">
+                          <h4 className="text-xs sm:text-sm uppercase tracking-wide text-muted-foreground font-semibold">Pack Bonos Chico</h4>
+                          {pricesData.packBonosChico.map((pack, packIndex) => (
+                            <div key={`chico-${packIndex}`} className="space-y-2">
+                              <div className="text-sm font-medium text-foreground">{pack.zona}</div>
+                              <div className="space-y-2 pl-4">
+                                {pack.opciones.map((opcion, opcionIndex) => {
+                                  const selectionKey = `chico-${packIndex}-${opcionIndex}`;
+                                  const isSelected = formData.depilacionSelections.some(
+                                    s => s.tipo === 'chico' && s.zona === pack.zona && s.sesiones === opcion.sesiones
+                                  );
+                                  return (
+                                    <label key={selectionKey} className="flex items-center gap-3 cursor-pointer">
+                                      <input
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        onChange={(e) => {
+                                          if (e.target.checked) {
+                                            setFormData({
+                                              ...formData,
+                                              depilacionSelections: [
+                                                ...formData.depilacionSelections,
+                                                { tipo: 'chico', zona: pack.zona, sesiones: opcion.sesiones, precio: opcion.precioFinal }
+                                              ]
+                                            });
+                                          } else {
+                                            setFormData({
+                                              ...formData,
+                                              depilacionSelections: formData.depilacionSelections.filter(
+                                                s => !(s.tipo === 'chico' && s.zona === pack.zona && s.sesiones === opcion.sesiones)
+                                              )
+                                            });
+                                          }
+                                        }}
+                                        className="w-4 h-4 text-primary focus:ring-primary"
+                                      />
+                                      <span className="text-xs sm:text-sm text-foreground">
+                                        {opcion.sesiones} sesión{opcion.sesiones > 1 ? 'es' : ''} - €{opcion.precioFinal}
+                                      </span>
+                                    </label>
+                                  );
+                                })}
+                              </div>
                             </div>
                           ))}
                         </div>
                       </div>
-                    ))}
+                    )}
                   </div>
 
-                  <div className="space-y-3 sm:space-y-4">
-                    <div className="text-xs sm:text-sm uppercase tracking-wide text-muted-foreground font-semibold mb-2 sm:mb-3">Packs Chico</div>
-                    {pricesData.packBonosChico.map((pack, packIndex) => (
-                      <div key={`chico-${packIndex}`} className="rounded-lg border border-primary/10 bg-white/40 px-3 sm:px-4 md:px-5 py-3 sm:py-4 space-y-2 sm:space-y-3 shadow-sm">
-                        <div className="font-semibold text-foreground text-sm sm:text-base">{pack.zona}</div>
-                        <div className="space-y-1.5 sm:space-y-2 pt-1">
-                          {pack.opciones.map((opcion, opcionIndex) => (
-                            <div key={`chico-${packIndex}-${opcionIndex}`} className="flex items-center justify-between text-xs sm:text-sm text-foreground/80 py-0.5 sm:py-1">
-                              <span>{opcion.sesiones} sesión(es)</span>
-                              <span className="font-semibold text-primary">€{opcion.precioFinal}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <label className="flex items-start gap-3 p-4 rounded-lg border border-primary/20 hover:border-primary/40 transition-colors cursor-pointer"
+                    style={{ backgroundColor: 'var(--color-secondary)' }}>
+                    <input
+                      type="checkbox"
+                      checked={formData.selectedServices.includes('Presoterapia')}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({
+                            ...formData,
+                            selectedServices: [...formData.selectedServices, 'Presoterapia']
+                          });
+                        } else {
+                          setFormData({
+                            ...formData,
+                            selectedServices: formData.selectedServices.filter(s => s !== 'Presoterapia')
+                          });
+                        }
+                      }}
+                      className="mt-1 w-4 h-4 text-primary focus:ring-primary"
+                    />
+                    <div className="flex-1">
+                      <span className="text-sm sm:text-base font-medium text-foreground">Presoterapia</span>
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-1">Tratamiento de drenaje linfático que mejora la circulación</p>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start gap-3 p-4 rounded-lg border border-primary/20 hover:border-primary/40 transition-colors cursor-pointer"
+                    style={{ backgroundColor: 'var(--color-secondary)' }}>
+                    <input
+                      type="checkbox"
+                      checked={formData.selectedServices.includes('Hydroface')}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({
+                            ...formData,
+                            selectedServices: [...formData.selectedServices, 'Hydroface']
+                          });
+                        } else {
+                          setFormData({
+                            ...formData,
+                            selectedServices: formData.selectedServices.filter(s => s !== 'Hydroface')
+                          });
+                        }
+                      }}
+                      className="mt-1 w-4 h-4 text-primary focus:ring-primary"
+                    />
+                    <div className="flex-1">
+                      <span className="text-sm sm:text-base font-medium text-foreground">Hydroface</span>
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-1">Tratamiento facial profundo de hidratación y limpieza</p>
+                    </div>
+                  </label>
                 </div>
               </div>
 
-              {/* Sección de otros servicios */}
-              <div className="grid gap-4 sm:gap-5 md:gap-6 md:grid-cols-2">
-                <div className="p-4 sm:p-5 md:p-6 lg:p-8 rounded-xl border border-primary/15 bg-white/50 shadow-sm space-y-2 sm:space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-primary/10">
-                    <h3 className="text-base sm:text-lg md:text-xl font-semibold text-foreground">Presoterapia</h3>
-                    <span className="text-primary font-bold text-base sm:text-lg md:text-xl">€120</span>
-                  </div>
-                  <p className="text-xs sm:text-sm md:text-base text-muted-foreground pt-1">Bono de 10 sesiones. Mejora la circulación y alivia la retención de líquidos.</p>
+              {/* Mensajes de estado */}
+              {sendStatus === 'success' && (
+                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400">
+                  <p className="text-sm sm:text-base font-medium">¡Reserva enviada con éxito!</p>
+                  <p className="text-xs sm:text-sm mt-1">Te contactaremos pronto.</p>
                 </div>
-                <div className="p-4 sm:p-5 md:p-6 lg:p-8 rounded-xl border border-primary/15 bg-white/50 shadow-sm space-y-2 sm:space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-primary/10">
-                    <h3 className="text-base sm:text-lg md:text-xl font-semibold text-foreground">Hydroface</h3>
-                    <span className="text-primary font-bold text-base sm:text-lg md:text-xl">€49</span>
-                  </div>
-                  <p className="text-xs sm:text-sm md:text-base text-muted-foreground pt-1">1 sesión de limpieza profunda e hidratación para una piel luminosa.</p>
-                </div>
-              </div>
+              )}
 
-              {/* Botón de cerrar */}
-              <div className="flex justify-center pt-2 sm:pt-3 md:pt-4 pb-2">
+              {sendStatus === 'error' && (
+                <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400">
+                  <p className="text-sm sm:text-base font-medium">Error al enviar la reserva</p>
+                  <p className="text-xs sm:text-sm mt-1">Por favor, inténtalo de nuevo o contáctanos directamente.</p>
+                </div>
+              )}
+
+              {/* Botones */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
+                <button
+                  type="submit"
+                  disabled={isSending || sendStatus === 'success'}
+                  className="btn-primary px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg w-full sm:flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSending ? 'Enviando...' : sendStatus === 'success' ? 'Enviado ✓' : 'Enviar'}
+                </button>
                 <button
                   type="button"
-                  onClick={() => setIsBookingModalOpen(false)}
-                  className="btn-primary px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg w-full sm:w-auto"
+                  onClick={() => {
+                    setIsBookingModalOpen(false);
+                    setSendStatus('idle');
+                  }}
+                  disabled={isSending}
+                  className="btn-secondary px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Cerrar
+                  Cancelar
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       )}
