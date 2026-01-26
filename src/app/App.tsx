@@ -1,12 +1,16 @@
-import { useState } from 'react';
-import { MapPin, Phone, Mail, Clock, X } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { MapPin, Phone, Mail, Clock, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import emailjs from '@emailjs/browser';
+import useEmblaCarousel from 'embla-carousel-react';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
 import pricesData from './resources/pricesDepilacion.json';
 // Import local images
 import presoterapiaImg from './resources/presoterapia.jpg';
 import oferta1Img from './resources/oferta1.jpeg';
 import hydrafaceImg from './resources/hydraface.jpeg';
+import carrusel1Img from './resources/fotocarrusel1.jpeg';
+import carrusel2Img from './resources/fotocarrusel2.jpeg';
+import carrusel3Img from './resources/fotocarrusel3.jpeg';
 
 export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,6 +32,56 @@ export default function App() {
   // Email sending state
   const [isSending, setIsSending] = useState(false);
   const [sendStatus, setSendStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  // Carousel state
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    loop: true,
+    slidesToScroll: 1,
+    containScroll: 'trimSnaps'
+  });
+  const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
+  const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
+
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
+
+  const onSelect = useCallback((emblaApi: any) => {
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+    setPrevBtnDisabled(!emblaApi.canScrollPrev());
+    setNextBtnDisabled(!emblaApi.canScrollNext());
+  }, []);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect(emblaApi);
+    emblaApi.on('reInit', onSelect);
+    emblaApi.on('select', onSelect);
+  }, [emblaApi, onSelect]);
+
+  // Autoplay functionality
+  useEffect(() => {
+    if (!emblaApi) return;
+    
+    const autoplayInterval = setInterval(() => {
+      emblaApi.scrollNext();
+    }, 4000);
+
+    return () => {
+      clearInterval(autoplayInterval);
+    };
+  }, [emblaApi]);
+
+  const carouselImages = [
+    carrusel1Img,
+    carrusel2Img,
+    carrusel3Img,
+  ];
 
   // Función para formatear las selecciones de depilación
   const formatDepilacionSelections = () => {
@@ -250,6 +304,66 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Separator */}
+      <div className="section-separator w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+
+      {/* Carousel Section */}
+      <section className="carousel-section py-8 sm:py-10 md:py-12 px-4 sm:px-6 lg:px-12 xl:px-16 w-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
+        <div className="w-full max-w-6xl mx-auto">
+          <div className="relative">
+            <div className="overflow-hidden rounded-2xl shadow-xl border border-primary/10" ref={emblaRef}>
+              <div className="flex gap-4">
+                {carouselImages.map((image, index) => (
+                  <div key={index} className="flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] min-w-0 px-2">
+                    <div className="relative w-full">
+                      <ImageWithFallback
+                        src={image}
+                        alt={`Carrusel ${index + 1}`}
+                        className="w-full h-auto object-contain rounded-lg"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Navigation Buttons */}
+            <button
+              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 hover:bg-white shadow-lg border border-primary/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-10"
+              onClick={scrollPrev}
+              disabled={prevBtnDisabled}
+              aria-label="Imagen anterior"
+            >
+              <ChevronLeft className="w-5 h-5 text-primary" />
+            </button>
+            <button
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 hover:bg-white shadow-lg border border-primary/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-10"
+              onClick={scrollNext}
+              disabled={nextBtnDisabled}
+              aria-label="Imagen siguiente"
+            >
+              <ChevronRight className="w-5 h-5 text-primary" />
+            </button>
+
+            {/* Dots Indicator */}
+            <div className="flex justify-center gap-2 mt-4">
+              {carouselImages.map((_, index) => (
+                <button
+                  key={index}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    selectedIndex === index
+                      ? 'bg-primary w-6'
+                      : 'bg-primary/30 w-1.5'
+                  }`}
+                  onClick={() => emblaApi?.scrollTo(index)}
+                  aria-label={`Ir a imagen ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
