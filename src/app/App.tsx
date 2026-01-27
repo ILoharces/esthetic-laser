@@ -6,8 +6,7 @@ import { ImageWithFallback } from './components/figma/ImageWithFallback';
 import pricesData from './resources/pricesDepilacion.json';
 // Import local images
 import presoterapiaImg from './resources/presoterapia.jpg';
-import oferta1Img from './resources/oferta1.jpeg';
-import hydrafaceImg from './resources/hydraface.jpeg';
+
 import carrusel1Img from './resources/fotocarrusel1.jpeg';
 import carrusel2Img from './resources/fotocarrusel2.jpeg';
 import carrusel3Img from './resources/fotocarrusel3.jpeg';
@@ -18,6 +17,8 @@ export default function App() {
   const [isHydrofaceModalOpen, setIsHydrofaceModalOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'chico' | 'chica'>('chica');
+  const [presoterapiaImageKey, setPresoterapiaImageKey] = useState(Date.now());
+  const [hydrofaceImageKey, setHydrofaceImageKey] = useState(Date.now());
 
   // Form state
   const [formData, setFormData] = useState({
@@ -253,64 +254,6 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
       {/* Separator */}
       <div className="section-separator w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
 
-      {/* Services Grid */}
-      <section id="servicios" className="services-section py-12 sm:py-16 md:py-24 px-4 sm:px-6 lg:px-12 xl:px-16 w-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
-        <div className="w-full max-w-7xl mx-auto">
-          <div className="text-center mb-8 sm:mb-12 md:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 px-2">
-              Nuestros Servicios
-            </h2>
-            <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
-            <p className="text-muted-foreground text-base sm:text-lg mt-4 sm:mt-6 max-w-2xl mx-auto px-4">
-              Tratamientos personalizados con la más alta tecnología para cuidar de tu belleza
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 justify-items-center">
-            {services.map((service, index) => (
-              <div
-                key={service.id}
-                className="group rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-primary/10 hover:border-primary/30 animate-fade-in-up"
-                style={{ backgroundColor: 'var(--color-secondary)', animationDelay: `${index * 0.1}s` }}
-              >
-                <div className="relative h-56 sm:h-64 md:h-72 overflow-hidden rounded-t-2xl">
-                  <ImageWithFallback
-                    src={service.image}
-                    alt={service.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-colors duration-300" />
-                  <div className="absolute bottom-4 left-4 right-4 text-center">
-                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">{service.title}</h3>
-                  </div>
-                </div>
-                <div className="p-4 sm:p-6 md:p-8 text-center">
-                  <p className="text-sm sm:text-base text-foreground/70 mb-4 sm:mb-6 leading-relaxed min-h-[4.5rem] text-center">
-                    {service.description}
-                  </p>
-                  <button
-                    className="w-full btn-secondary text-center text-sm sm:text-base"
-                    onClick={() => {
-                      if (service.id === 1) {
-                        setIsModalOpen(true);
-                      } else if (service.id === 2) {
-                        setIsPresoterapiaModalOpen(true);
-                      } else if (service.id === 3) {
-                        setIsHydrofaceModalOpen(true);
-                      }
-                    }}
-                  >
-                    Más información
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Separator */}
-      <div className="section-separator w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
-
       {/* Carousel Section */}
       <section className="carousel-section py-8 sm:py-10 md:py-12 px-4 sm:px-6 lg:px-12 xl:px-16 w-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
         <div className="w-full max-w-6xl mx-auto">
@@ -364,6 +307,66 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
                 />
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Separator */}
+      <div className="section-separator w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
+
+      {/* Services Grid */}
+      <section id="servicios" className="services-section py-12 sm:py-16 md:py-24 px-4 sm:px-6 lg:px-12 xl:px-16 w-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
+        <div className="w-full max-w-7xl mx-auto">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 px-2">
+              Nuestros Servicios
+            </h2>
+            <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
+            <p className="text-muted-foreground text-base sm:text-lg mt-4 sm:mt-6 max-w-2xl mx-auto px-4">
+              Tratamientos personalizados con la más alta tecnología para cuidar de tu belleza
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 justify-items-center">
+            {services.map((service, index) => (
+              <div
+                key={service.id}
+                className="group rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-primary/10 hover:border-primary/30 animate-fade-in-up"
+                style={{ backgroundColor: 'var(--color-secondary)', animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="relative h-56 sm:h-64 md:h-72 overflow-hidden rounded-t-2xl">
+                  <ImageWithFallback
+                    src={service.image}
+                    alt={service.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-colors duration-300" />
+                  <div className="absolute bottom-4 left-4 right-4 text-center">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">{service.title}</h3>
+                  </div>
+                </div>
+                <div className="p-4 sm:p-6 md:p-8 text-center">
+                  <p className="text-sm sm:text-base text-foreground/70 mb-4 sm:mb-6 leading-relaxed min-h-[4.5rem] text-center">
+                    {service.description}
+                  </p>
+                  <button
+                    className="w-full btn-secondary text-center text-sm sm:text-base"
+                    onClick={() => {
+                      if (service.id === 1) {
+                        setIsModalOpen(true);
+                      } else if (service.id === 2) {
+                        setPresoterapiaImageKey(Date.now());
+                        setIsPresoterapiaModalOpen(true);
+                      } else if (service.id === 3) {
+                        setHydrofaceImageKey(Date.now());
+                        setIsHydrofaceModalOpen(true);
+                      }
+                    }}
+                  >
+                    Más información
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -428,7 +431,7 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
                       <h4 className="font-semibold text-foreground mb-2 text-lg">Horario</h4>
                       <p className="text-muted-foreground leading-relaxed">
                         Lunes - Viernes: 9:00 - 21:00<br />
-                        Sábados: 9:00 - 17:00
+                        Sábados: 9:00 - 16:00
                       </p>
                     </div>
                   </div>
@@ -549,11 +552,12 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
 
             {/* Contenido del Modal */}
             <div className="px-6 sm:px-8 md:px-10 lg:px-12 py-6 sm:py-8 md:py-10">
-              <div className="flex justify-center">
+              <div className="flex justify-center items-center w-full">
                 <ImageWithFallback
-                  src={oferta1Img}
+                  key={`presoterapia-${presoterapiaImageKey}`}
+                  src={`https://res.cloudinary.com/dlddss5wv/image/upload/v1769537090/oferta1_dya8qc.jpg?_cb=${presoterapiaImageKey}`}
                   alt="Presoterapia"
-                  className="max-w-full h-auto rounded-lg"
+                  className="max-w-full max-h-[calc(95vh-200px)] w-auto h-auto object-contain rounded-lg"
                 />
               </div>
             </div>
@@ -597,11 +601,12 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
 
             {/* Contenido del Modal */}
             <div className="px-6 sm:px-8 md:px-10 lg:px-12 py-6 sm:py-8 md:py-10">
-              <div className="flex justify-center">
+              <div className="flex justify-center items-center w-full">
                 <ImageWithFallback
-                  src={hydrafaceImg}
+                  key={`hydroface-${hydrofaceImageKey}`}
+                  src={`https://res.cloudinary.com/dlddss5wv/image/upload/v1769537216/oferta2_jydxqc.jpg?_cb=${hydrofaceImageKey}`}
                   alt="Hydroface"
-                  className="max-w-full h-auto rounded-lg"
+                  className="max-w-full max-h-[calc(95vh-200px)] w-auto h-auto object-contain rounded-lg"
                 />
               </div>
             </div>
