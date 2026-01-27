@@ -19,6 +19,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'chico' | 'chica'>('chica');
   const [presoterapiaImageKey, setPresoterapiaImageKey] = useState(Date.now());
   const [hydrofaceImageKey, setHydrofaceImageKey] = useState(Date.now());
+  const [depilacionImageKey, setDepilacionImageKey] = useState(Date.now());
 
   // Form state
   const [formData, setFormData] = useState({
@@ -352,6 +353,7 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
                     className="w-full btn-secondary text-center text-sm sm:text-base"
                     onClick={() => {
                       if (service.id === 1) {
+                        setDepilacionImageKey(Date.now());
                         setIsModalOpen(true);
                       } else if (service.id === 2) {
                         setPresoterapiaImageKey(Date.now());
@@ -493,33 +495,26 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
                   onClick={() => setActiveTab('chica')}
                   className={`flex-1 pb-4 font-semibold border-b-2 transition-colors ${activeTab === 'chica' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'}`}
                 >
-                  Pack Bonos Chica
+                  Bonos chica
                 </button>
                 <button
                   onClick={() => setActiveTab('chico')}
                   className={`flex-1 pb-4 font-semibold border-b-2 transition-colors ${activeTab === 'chico' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'}`}
                 >
-                  Pack Bonos Chico
+                  Bonos chico
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 gap-8">
-                {(activeTab === 'chico' ? pricesData.packBonosChico : pricesData.packBonosChica).map((pack, index) => (
-                  <div key={index} className="space-y-4">
-                    <h4 className="text-lg font-bold text-primary">{pack.zona}</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {pack.opciones.map((opcion, i) => (
-                        <div key={i} className="p-5 rounded-2xl bg-primary/5 border border-primary/10 text-center">
-                          <p className="text-sm text-muted-foreground mb-1">{opcion.sesiones} sesiones</p>
-                          <div className="flex items-center justify-center gap-2">
-                            <span className="text-xs line-through opacity-50">€{opcion.precioOriginal}</span>
-                            <span className="text-xl font-bold text-foreground">€{opcion.precioFinal}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+              <div className="flex justify-center items-center w-full">
+                <ImageWithFallback
+                  key={`depilacion-${activeTab}-${depilacionImageKey}`}
+                  src={activeTab === 'chica' 
+                    ? `https://res.cloudinary.com/dlddss5wv/image/upload/v1769547953/bonos_chica_oj6n9e.jpg?_cb=${depilacionImageKey}`
+                    : `https://res.cloudinary.com/dlddss5wv/image/upload/v1769547947/bonos_chico_reazdm.jpg?_cb=${depilacionImageKey}`
+                  }
+                  alt={activeTab === 'chica' ? 'Bonos chica' : 'Bonos chico'}
+                  className="max-w-full max-h-[calc(95vh-200px)] w-auto h-auto object-contain rounded-lg"
+                />
               </div>
             </div>
           </div>
