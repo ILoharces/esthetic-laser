@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { MapPin, Phone, Mail, Clock, X, ChevronLeft, ChevronRight, Heart } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -87,6 +87,32 @@ export default function App() {
     carrusel2Img,
     carrusel3Img,
   ];
+
+  // San Valentín: visible solo del 7 al 14 de febrero (el 15 a las 00:00 desaparece)
+  const [today, setToday] = useState(() => new Date().toISOString().slice(0, 10));
+  useEffect(() => {
+    const scheduleNextMidnight = () => {
+      const now = new Date();
+      const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      const ms = next.getTime() - now.getTime();
+      return setTimeout(() => {
+        setToday(new Date().toISOString().slice(0, 10));
+        scheduleNextMidnight();
+      }, ms);
+    };
+    const t = scheduleNextMidnight();
+    return () => clearTimeout(t);
+  }, [today]);
+
+  const isSanValentinPeriod = useMemo(() => {
+    const [, m, d] = today.split('-').map(Number);
+    if (m !== 2) return false;
+    return d >= 7 && d <= 14;
+  }, [today]);
+
+  useEffect(() => {
+    if (!isSanValentinPeriod && isValentinModalOpen) setIsValentinModalOpen(false);
+  }, [isSanValentinPeriod, isValentinModalOpen]);
 
   // Función para formatear las selecciones de depilación
   const formatDepilacionSelections = () => {
@@ -220,19 +246,20 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
   return (
     <div className="min-h-screen w-full relative" style={{ backgroundColor: 'var(--color-secondary)' }}>
 
-      {/* Botón flotante San Valentín */}
-      <button
-        onClick={() => {
-          document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' });
-        }}
-        className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group animate-fade-in-up"
-        aria-label="Ir a ofertas de San Valentín"
-        style={{ 
-          boxShadow: '0 4px 20px rgba(236, 72, 153, 0.4)',
-        }}
-      >
-        <Heart className="w-6 h-6 sm:w-7 sm:h-7 text-white fill-white group-hover:scale-110 transition-transform duration-300" />
-      </button>
+      {isSanValentinPeriod && (
+        <button
+          onClick={() => {
+            document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group animate-fade-in-up"
+          aria-label="Ir a ofertas de San Valentín"
+          style={{ 
+            boxShadow: '0 4px 20px rgba(236, 72, 153, 0.4)',
+          }}
+        >
+          <Heart className="w-6 h-6 sm:w-7 sm:h-7 text-white fill-white group-hover:scale-110 transition-transform duration-300" />
+        </button>
+      )}
 
       <section className="hero-section min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden w-full" style={{ backgroundColor: 'var(--color-secondary)', zIndex: 10 }}>
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" style={{ zIndex: 10 }}></div>
@@ -345,34 +372,35 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
             </p>
           </div>
           
-          {/* Nuevo menú de ancho completo */}
-          <div className="mb-6 sm:mb-8">
-            <div
-              className="group rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-primary/10 hover:border-primary/30 animate-fade-in-up cursor-pointer w-full"
-              style={{ backgroundColor: 'var(--color-secondary)' }}
-              onClick={() => {
-                setValentinImageKey(Date.now());
-                setIsValentinModalOpen(true);
-              }}
-            >
-              <div className="relative h-64 sm:h-80 md:h-96 lg:h-[500px] overflow-hidden rounded-t-2xl">
-                <ImageWithFallback
-                  src={valentinImg}
-                  alt="Valentin"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-colors duration-300" />
-                <div className="absolute bottom-4 left-4 right-4 text-center">
-                  <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">Ofertas de San Valentin</h3>
+          {isSanValentinPeriod && (
+            <div className="mb-6 sm:mb-8">
+              <div
+                className="group rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-primary/10 hover:border-primary/30 animate-fade-in-up cursor-pointer w-full"
+                style={{ backgroundColor: 'var(--color-secondary)' }}
+                onClick={() => {
+                  setValentinImageKey(Date.now());
+                  setIsValentinModalOpen(true);
+                }}
+              >
+                <div className="relative h-64 sm:h-80 md:h-96 lg:h-[500px] overflow-hidden rounded-t-2xl">
+                  <ImageWithFallback
+                    src={valentinImg}
+                    alt="Valentin"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-colors duration-300" />
+                  <div className="absolute bottom-4 left-4 right-4 text-center">
+                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">Ofertas de San Valentin</h3>
+                  </div>
+                </div>
+                <div className="p-4 sm:p-6 md:p-8 text-center">
+                  <button className="w-full btn-secondary text-center text-sm sm:text-base">
+                    Más información
+                  </button>
                 </div>
               </div>
-              <div className="p-4 sm:p-6 md:p-8 text-center">
-                <button className="w-full btn-secondary text-center text-sm sm:text-base">
-                  Más información
-                </button>
-              </div>
             </div>
-          </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 justify-items-center">
             {services.map((service, index) => (
@@ -666,8 +694,8 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
         </div>
       )}
 
-      {/* Modal de Valentin */}
-      {isValentinModalOpen && (
+      {/* Modal de Valentin (solo visible en periodo San Valentín) */}
+      {isSanValentinPeriod && isValentinModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
