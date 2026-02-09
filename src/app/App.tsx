@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { MapPin, Phone, Mail, Clock, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, X, ChevronLeft, ChevronRight, Heart } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 import useEmblaCarousel from 'embla-carousel-react';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
 import pricesData from './resources/pricesDepilacion.json';
 // Import local images
 import presoterapiaImg from './resources/presoterapia.jpg';
+import valentinImg from './resources/valentin.jpg';
 
 import carrusel1Img from './resources/fotocarrusel1.jpeg';
 import carrusel2Img from './resources/fotocarrusel2.jpeg';
@@ -15,11 +16,13 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPresoterapiaModalOpen, setIsPresoterapiaModalOpen] = useState(false);
   const [isHydrofaceModalOpen, setIsHydrofaceModalOpen] = useState(false);
+  const [isValentinModalOpen, setIsValentinModalOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'chico' | 'chica'>('chica');
   const [presoterapiaImageKey, setPresoterapiaImageKey] = useState(Date.now());
   const [hydrofaceImageKey, setHydrofaceImageKey] = useState(Date.now());
   const [depilacionImageKey, setDepilacionImageKey] = useState(Date.now());
+  const [valentinImageKey, setValentinImageKey] = useState(Date.now());
 
   // Form state
   const [formData, setFormData] = useState({
@@ -215,11 +218,25 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
   ];
 
   return (
-    <div className="min-h-screen w-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
+    <div className="min-h-screen w-full relative" style={{ backgroundColor: 'var(--color-secondary)' }}>
 
-      <section className="hero-section min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden w-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none"></div>
-        <div className="w-full text-center relative z-10 animate-fade-in-up">
+      {/* Botón flotante San Valentín */}
+      <button
+        onClick={() => {
+          document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' });
+        }}
+        className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group animate-fade-in-up"
+        aria-label="Ir a ofertas de San Valentín"
+        style={{ 
+          boxShadow: '0 4px 20px rgba(236, 72, 153, 0.4)',
+        }}
+      >
+        <Heart className="w-6 h-6 sm:w-7 sm:h-7 text-white fill-white group-hover:scale-110 transition-transform duration-300" />
+      </button>
+
+      <section className="hero-section min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden w-full" style={{ backgroundColor: 'var(--color-secondary)', zIndex: 10 }}>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" style={{ zIndex: 10 }}></div>
+        <div className="w-full text-center relative animate-fade-in-up" style={{ zIndex: 20 }}>
           <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-primary mb-6 sm:mb-8 leading-tight tracking-tight px-2">
             Esthetic Laser
           </h1>
@@ -256,7 +273,7 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
       <div className="section-separator w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
 
       {/* Carousel Section */}
-      <section className="carousel-section py-8 sm:py-10 md:py-12 px-4 sm:px-6 lg:px-12 xl:px-16 w-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
+      <section className="carousel-section py-8 sm:py-10 md:py-12 px-4 sm:px-6 lg:px-12 xl:px-16 w-full relative" style={{ backgroundColor: 'var(--color-secondary)', zIndex: 10 }}>
         <div className="w-full max-w-6xl mx-auto">
           <div className="relative">
             <div className="overflow-hidden rounded-2xl shadow-xl border border-primary/10" ref={emblaRef}>
@@ -316,7 +333,7 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
       <div className="section-separator w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
 
       {/* Services Grid */}
-      <section id="servicios" className="services-section py-12 sm:py-16 md:py-24 px-4 sm:px-6 lg:px-12 xl:px-16 w-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
+      <section id="servicios" className="services-section py-12 sm:py-16 md:py-24 px-4 sm:px-6 lg:px-12 xl:px-16 w-full relative" style={{ backgroundColor: 'var(--color-secondary)', zIndex: 10 }}>
         <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-8 sm:mb-12 md:mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 px-2">
@@ -327,6 +344,36 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
               Tratamientos personalizados con la más alta tecnología para cuidar de tu belleza
             </p>
           </div>
+          
+          {/* Nuevo menú de ancho completo */}
+          <div className="mb-6 sm:mb-8">
+            <div
+              className="group rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-primary/10 hover:border-primary/30 animate-fade-in-up cursor-pointer w-full"
+              style={{ backgroundColor: 'var(--color-secondary)' }}
+              onClick={() => {
+                setValentinImageKey(Date.now());
+                setIsValentinModalOpen(true);
+              }}
+            >
+              <div className="relative h-64 sm:h-80 md:h-96 lg:h-[500px] overflow-hidden rounded-t-2xl">
+                <ImageWithFallback
+                  src={valentinImg}
+                  alt="Valentin"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-colors duration-300" />
+                <div className="absolute bottom-4 left-4 right-4 text-center">
+                  <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">Ofertas de San Valentin</h3>
+                </div>
+              </div>
+              <div className="p-4 sm:p-6 md:p-8 text-center">
+                <button className="w-full btn-secondary text-center text-sm sm:text-base">
+                  Más información
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 justify-items-center">
             {services.map((service, index) => (
               <div
@@ -377,7 +424,7 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
       <div className="section-separator w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
 
       {/* Contact & Location Section */}
-      <section className="contact-section py-12 sm:py-16 md:py-24 px-4 sm:px-6 lg:px-12 xl:px-16 w-full" style={{ backgroundColor: 'var(--color-secondary)' }}>
+      <section className="contact-section py-12 sm:py-16 md:py-24 px-4 sm:px-6 lg:px-12 xl:px-16 w-full relative" style={{ backgroundColor: 'var(--color-secondary)', zIndex: 10 }}>
         <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-8 sm:mb-12 md:mb-16 mt-4 sm:mt-8">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 px-2">Visítanos</h2>
@@ -611,6 +658,55 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
               <button
                 className="btn-primary text-sm sm:text-base"
                 onClick={() => setIsHydrofaceModalOpen(false)}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Valentin */}
+      {isValentinModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+          onClick={() => setIsValentinModalOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-2xl shadow-2xl m-2 sm:m-4"
+            style={{ backgroundColor: 'var(--color-secondary)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header del Modal */}
+            <div className="sticky top-0 z-10 flex items-center justify-between px-6 sm:px-8 md:px-10 py-5 sm:py-6 md:py-7 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
+              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground pr-2">Ofertas de San Valentin</h2>
+              <button
+                onClick={() => setIsValentinModalOpen(false)}
+                className="p-2 rounded-full hover:bg-primary/10 transition-colors"
+                aria-label="Cerrar"
+              >
+                <X className="w-6 h-6 text-foreground" />
+              </button>
+            </div>
+
+            {/* Contenido del Modal */}
+            <div className="px-6 sm:px-8 md:px-10 lg:px-12 py-6 sm:py-8 md:py-10">
+              <div className="flex justify-center items-center w-full">
+                <ImageWithFallback
+                  key={`valentin-${valentinImageKey}`}
+                  src={`https://res.cloudinary.com/dlddss5wv/image/upload/v1770380804/main-sample.png?_cb=${valentinImageKey}`}
+                  alt="Valentin"
+                  className="max-w-full max-h-[calc(95vh-200px)] w-auto h-auto object-contain rounded-lg"
+                />
+              </div>
+            </div>
+
+            {/* Footer del Modal */}
+            <div className="sticky bottom-0 px-6 sm:px-8 md:px-10 lg:px-12 py-5 sm:py-6 md:py-7 border-t border-primary/20 flex justify-end" style={{ backgroundColor: 'var(--color-secondary)' }}>
+              <button
+                className="btn-primary text-sm sm:text-base"
+                onClick={() => setIsValentinModalOpen(false)}
               >
                 Cerrar
               </button>
