@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { MapPin, Phone, Mail, Clock, X, ChevronLeft, ChevronRight, Heart } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -23,6 +23,15 @@ export default function App() {
   const [hydrofaceImageKey, setHydrofaceImageKey] = useState(Date.now());
   const [depilacionImageKey, setDepilacionImageKey] = useState(Date.now());
   const [valentinImageKey, setValentinImageKey] = useState(Date.now());
+  const [ofertasImageIndex, setOfertasImageIndex] = useState(0);
+
+  const ofertasImages = [
+    'https://res.cloudinary.com/dlddss5wv/image/upload/v1771521073/main-sample.jpg',
+    'https://res.cloudinary.com/dlddss5wv/image/upload/v1771952041/main-sample_tlvkuc.png',
+  ];
+  // Imagen fiable para la tarjeta de Ofertas cuando no es San Valentín (Unsplash CDN)
+  const ofertasCardImage =
+    'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1080&q=80&fit=crop';
 
   // Form state
   const [formData, setFormData] = useState({
@@ -110,8 +119,12 @@ export default function App() {
     return d >= 7 && d <= 14;
   }, [today]);
 
+  const wasSanValentinPeriod = useRef(isSanValentinPeriod);
   useEffect(() => {
-    if (!isSanValentinPeriod && isValentinModalOpen) setIsValentinModalOpen(false);
+    if (wasSanValentinPeriod.current && !isSanValentinPeriod && isValentinModalOpen) {
+      setIsValentinModalOpen(false);
+    }
+    wasSanValentinPeriod.current = isSanValentinPeriod;
   }, [isSanValentinPeriod, isValentinModalOpen]);
 
   // Función para formatear las selecciones de depilación
@@ -372,35 +385,45 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
             </p>
           </div>
           
-          {isSanValentinPeriod && (
-            <div className="mb-6 sm:mb-8">
-              <div
-                className="group rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-primary/10 hover:border-primary/30 animate-fade-in-up cursor-pointer w-full"
-                style={{ backgroundColor: 'var(--color-secondary)' }}
-                onClick={() => {
-                  setValentinImageKey(Date.now());
-                  setIsValentinModalOpen(true);
-                }}
-              >
-                <div className="relative h-64 sm:h-80 md:h-96 lg:h-[500px] overflow-hidden rounded-t-2xl">
-                  <ImageWithFallback
-                    src={valentinImg}
-                    alt="Valentin"
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-colors duration-300" />
-                  <div className="absolute bottom-4 left-4 right-4 text-center">
-                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">Ofertas de San Valentin</h3>
-                  </div>
-                </div>
-                <div className="p-4 sm:p-6 md:p-8 text-center">
-                  <button className="w-full btn-secondary text-center text-sm sm:text-base">
-                    Más información
-                  </button>
+          {/* Sección Ofertas: permanente; estética San Valentín solo del 7 al 14 feb */}
+          <div className="mb-6 sm:mb-8">
+            <div
+              className={`group rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 animate-fade-in-up cursor-pointer w-full ${
+                isSanValentinPeriod
+                  ? 'border-2 border-pink-400/50 hover:border-pink-500/70'
+                  : 'border border-primary/10 hover:border-primary/30'
+              }`}
+              style={{ backgroundColor: 'var(--color-secondary)' }}
+              onClick={() => {
+                setValentinImageKey(Date.now());
+                setOfertasImageIndex(0);
+                setIsValentinModalOpen(true);
+              }}
+            >
+              <div className="relative h-64 sm:h-80 md:h-96 lg:h-[500px] overflow-hidden rounded-t-2xl">
+                <ImageWithFallback
+                  src={isSanValentinPeriod ? valentinImg : ofertasCardImage}
+                  alt={isSanValentinPeriod ? 'Ofertas San Valentín' : 'Ofertas'}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-colors duration-300" />
+                <div className="absolute bottom-4 left-4 right-4 text-center">
+                  <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">
+                    {isSanValentinPeriod ? 'Ofertas de San Valentin' : 'Ofertas'}
+                  </h3>
                 </div>
               </div>
+              <div className="p-4 sm:p-6 md:p-8 text-center">
+                <button className={`w-full text-center text-sm sm:text-base rounded-lg font-medium py-2.5 transition-colors ${
+                  isSanValentinPeriod
+                    ? 'bg-gradient-to-r from-pink-500 to-red-500 text-white hover:from-pink-600 hover:to-red-600'
+                    : 'btn-secondary'
+                }`}>
+                  Más información
+                </button>
+              </div>
             </div>
-          )}
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 justify-items-center">
             {services.map((service, index) => (
@@ -694,8 +717,8 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
         </div>
       )}
 
-      {/* Modal de Valentin (solo visible en periodo San Valentín) */}
-      {isSanValentinPeriod && isValentinModalOpen && (
+      {/* Modal de Ofertas: dos imágenes con flechas (siempre disponible al abrir desde la sección ofertas) */}
+      {isValentinModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
@@ -708,7 +731,9 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
           >
             {/* Header del Modal */}
             <div className="sticky top-0 z-10 flex items-center justify-between px-6 sm:px-8 md:px-10 py-5 sm:py-6 md:py-7 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground pr-2">Ofertas de San Valentin</h2>
+              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground pr-2">
+                {isSanValentinPeriod ? 'Ofertas de San Valentin' : 'Ofertas'}
+              </h2>
               <button
                 onClick={() => setIsValentinModalOpen(false)}
                 className="p-2 rounded-full hover:bg-primary/10 transition-colors"
@@ -718,15 +743,44 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
               </button>
             </div>
 
-            {/* Contenido del Modal */}
-            <div className="px-6 sm:px-8 md:px-10 lg:px-12 py-6 sm:py-8 md:py-10">
-              <div className="flex justify-center items-center w-full">
+            {/* Contenido: imagen actual con flechas */}
+            <div className="px-6 sm:px-8 md:px-10 lg:px-12 py-6 sm:py-8 md:py-10 relative">
+              <div className="flex justify-center items-center w-full min-h-[200px] relative">
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setOfertasImageIndex((i) => (i === 0 ? ofertasImages.length - 1 : i - 1)); }}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 hover:bg-white shadow-lg border border-primary/20 z-10"
+                  aria-label="Imagen anterior"
+                >
+                  <ChevronLeft className="w-5 h-5 text-primary" />
+                </button>
                 <ImageWithFallback
-                  key={`valentin-${valentinImageKey}`}
-                  src={`https://res.cloudinary.com/dlddss5wv/image/upload/v1770380804/main-sample.png?_cb=${valentinImageKey}`}
-                  alt="Valentin"
+                  key={`ofertas-${valentinImageKey}-${ofertasImageIndex}`}
+                  src={`${ofertasImages[ofertasImageIndex]}?_cb=${valentinImageKey}`}
+                  alt={`Oferta ${ofertasImageIndex + 1}`}
                   className="max-w-full max-h-[calc(95vh-200px)] w-auto h-auto object-contain rounded-lg"
                 />
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setOfertasImageIndex((i) => (i === ofertasImages.length - 1 ? 0 : i + 1)); }}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 hover:bg-white shadow-lg border border-primary/20 z-10"
+                  aria-label="Imagen siguiente"
+                >
+                  <ChevronRight className="w-5 h-5 text-primary" />
+                </button>
+              </div>
+              <div className="flex justify-center gap-2 mt-4">
+                {ofertasImages.map((_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setOfertasImageIndex(index); }}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      ofertasImageIndex === index ? 'bg-primary w-6' : 'bg-primary/30 w-1.5'
+                    }`}
+                    aria-label={`Ir a imagen ${index + 1}`}
+                  />
+                ))}
               </div>
             </div>
 
