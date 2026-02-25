@@ -973,7 +973,7 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
                                         className="w-4 h-4 text-primary focus:ring-primary"
                                       />
                                       <span className="text-xs sm:text-sm text-foreground">
-                                        {opcion.sesiones} sesión{opcion.sesiones > 1 ? 'es' : ''} - €{opcion.precioFinal}
+                                        {opcion.sesiones} sesión{opcion.sesiones > 1 ? 'es' : ''}
                                       </span>
                                     </label>
                                   );
@@ -1021,7 +1021,7 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
                                         className="w-4 h-4 text-primary focus:ring-primary"
                                       />
                                       <span className="text-xs sm:text-sm text-foreground">
-                                        {opcion.sesiones} sesión{opcion.sesiones > 1 ? 'es' : ''} - €{opcion.precioFinal}
+                                        {opcion.sesiones} sesión{opcion.sesiones > 1 ? 'es' : ''}
                                       </span>
                                     </label>
                                   );
