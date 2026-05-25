@@ -281,7 +281,7 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
             Esthetic Laser
           </h1>
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 sm:mb-6 leading-tight px-2">
-            Servicios de Estética
+            Depilación Láser Diodo Pamplona
             <span className="block text-primary mt-2">Profesional</span>
           </h2>
           <div className="w-full flex justify-center px-4">
