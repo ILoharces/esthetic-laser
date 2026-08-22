@@ -1,0 +1,57 @@
+---
+import App from '../app/App';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../lib/site';
+
+const localBusiness = {
+  '@context': 'https://schema.org',
+  '@type': 'BeautySalon',
+  name: SITE.name,
+  url: SITE.url,
+  description: SITE.description,
+  telephone: SITE.phone,
+  email: SITE.email,
+  image: `${SITE.url}/favicon.svg`,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: `${SITE.street}, Centro Comercial Eroski`,
+    addressLocality: SITE.locality,
+    addressRegion: SITE.region,
+    postalCode: SITE.postalCode,
+    addressCountry: SITE.country,
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: 42.834082,
+    longitude: -1.68167,
+  },
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '09:00',
+      closes: '21:00',
+    },
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: 'Saturday',
+      opens: '09:00',
+      closes: '16:00',
+    },
+  ],
+  areaServed: {
+    '@type': 'City',
+    name: 'Pamplona',
+  },
+};
+---
+
+<BaseLayout
+  title={SITE.title}
+  description={SITE.description}
+  canonical={SITE.url + '/'}
+  identityWidget
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(localBusiness)} />
+  <App client:load />
+</BaseLayout>

@@ -1,0 +1,31 @@
+backend:
+  name: git-gateway
+  branch: main
+
+locale: es
+media_folder: public/images/blog
+public_folder: /images/blog
+
+collections:
+  - name: blog
+    label: Blog
+    folder: content/blog
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: Título, name: title, widget: string, hint: "Incluye la búsqueda (ej. Depilación láser diodo en Pamplona)" }
+      - { label: Descripción SEO, name: description, widget: text, hint: "150-160 caracteres. Resumen para Google." }
+      - { label: Fecha, name: date, widget: datetime }
+      - { label: Imagen de portada, name: cover, widget: image }
+      - { label: Texto alternativo de la imagen, name: coverAlt, widget: string }
+      - { label: Etiquetas, name: tags, widget: list }
+      - label: Servicio relacionado
+        name: service
+        widget: select
+        options:
+          - { label: Depilación láser, value: depilacion }
+          - { label: Presoterapia, value: presoterapia }
+          - { label: Hydroface, value: hydroface }
+          - { label: General, value: general }
+      - { label: Borrador, name: draft, widget: boolean, default: false }
+      - { label: Contenido, name: body, widget: markdown }

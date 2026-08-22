@@ -13,240 +13,223 @@
   --color-border: #FBCFE8;
 }
 
-/* Custom color utilities */
-.text-primary {
-  color: var(--color-primary);
-}
-
-.bg-primary {
-  background-color: var(--color-primary);
-}
-
-.hover\:bg-primary\/90:hover {
-  background-color: var(--color-primary-dark);
-}
-
-.text-primary-foreground {
-  color: var(--color-primary-foreground);
-}
-
-.bg-secondary {
-  background-color: var(--color-secondary);
-}
-
-.bg-accent {
-  background-color: var(--color-accent);
-}
-
-.text-foreground {
-  color: var(--color-foreground);
-}
-
-.text-muted-foreground {
-  color: var(--color-muted-foreground);
-}
-
-.border-primary\/10 {
-  border-color: rgba(236, 72, 153, 0.1);
-}
-
-.border-primary\/30 {
-  border-color: rgba(236, 72, 153, 0.3);
-}
-
-/* Global Styles */
-* {
-  margin-top: 0px;
-  padding: 0;
-}
-
-html {
-  scroll-behavior: smooth;
-  width: 100%;
-  overflow-x: hidden;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  color: var(--color-foreground);
-  background-color: #FDF2F8;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  line-height: 1.6;
-  width: 100%;
-  overflow-x: hidden;
-}
-
-#root {
-  width: 100%;
-  min-height: 100vh;
-}
-
-/* Animations */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.8s ease-out;
-}
-
-/* Professional Button Styles */
-.btn-primary {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-  color: var(--color-primary-foreground);
-  padding: 0.875rem 2rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.2);
-  border: none;
-  cursor: pointer;
-  display: inline-block;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.3);
-}
-
-.btn-secondary {
-  background: transparent;
-  color: var(--color-primary);
-  border: 2px solid var(--color-primary);
-  padding: 0.875rem 2rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  display: inline-block;
-}
-
-.btn-secondary:hover {
-  background: var(--color-primary);
-  color: var(--color-primary-foreground);
-  transform: translateY(-2px);
-}
-
-/* Section Margins */
-.hero-section {
-  /* Hero section now uses min-h-screen and flexbox for full viewport height */
-  padding: 1rem 0;
-}
-
-.services-section {
-  margin-top: 6rem;
-  margin-bottom: 6rem;
-}
-
-.contact-section {
-  margin-top: 6rem;
-  margin-bottom: 6rem;
-}
-
-.footer-section {
-  margin-top: 6rem;
-}
-
-.section-separator {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-}
-
-/* Mobile Responsive Styles */
-@media (max-width: 640px) {
-  /* Hero Section Mobile */
-  .hero-section {
-    min-height: 100vh;
-    padding: 1rem 0.5rem;
+@layer components {
+  /* Custom color utilities */
+  .text-primary {
+    color: var(--color-primary);
   }
 
-  /* Button adjustments for mobile */
-  .btn-primary,
-  .btn-secondary {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9rem;
+  .bg-primary {
+    background-color: var(--color-primary);
+  }
+
+  .hover\:bg-primary\/90:hover {
+    background-color: var(--color-primary-dark);
+  }
+
+  .text-primary-foreground {
+    color: var(--color-primary-foreground);
+  }
+
+  .bg-secondary {
+    background-color: var(--color-secondary);
+  }
+
+  .bg-accent {
+    background-color: var(--color-accent);
+  }
+
+  .text-foreground {
+    color: var(--color-foreground);
+  }
+
+  .text-muted-foreground {
+    color: var(--color-muted-foreground);
+  }
+
+  .border-primary\/10 {
+    border-color: rgba(236, 72, 153, 0.1);
+  }
+
+  .border-primary\/30 {
+    border-color: rgba(236, 72, 153, 0.3);
+  }
+
+  html {
+    scroll-behavior: smooth;
     width: 100%;
-    max-width: 280px;
+    overflow-x: hidden;
   }
 
-  /* Services Section Mobile */
-  .services-section {
-    padding: 2rem 0.5rem !important;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
+  #inicio,
+  #galeria,
+  #servicios,
+  #contacto {
+    scroll-margin-top: 1.5rem;
   }
 
-  /* Contact Section Mobile */
-  .contact-section {
-    padding: 2rem 0.5rem !important;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    color: var(--color-foreground);
+    background-color: #FDF2F8;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.6;
+    width: 100%;
+    overflow-x: hidden;
   }
 
-  /* Map height adjustment for mobile */
-  .contact-section iframe {
-    height: 300px !important;
-    min-height: 300px;
+  #root {
+    width: 100%;
+    min-height: 100vh;
   }
 
-  /* Footer Mobile */
-  .footer-section {
-    padding: 2rem 1rem;
-    margin-top: 2rem;
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
-  /* Modal adjustments for mobile */
-  .modal-content {
-    margin: 0.5rem;
-    max-height: 95vh;
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
-  /* Section separator mobile */
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  /* Professional Button Styles */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: var(--color-primary-foreground);
+    padding: 0.875rem 2rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.2);
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.3);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    padding: 0.875rem 2rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  .btn-secondary:hover {
+    background: var(--color-primary);
+    color: var(--color-primary-foreground);
+    transform: translateY(-2px);
+  }
+
+  a.btn-primary,
+  a.btn-secondary {
+    text-decoration: none;
+    text-align: center;
+  }
+
   .section-separator {
-    margin-top: 1rem;
+    margin: 0;
+  }
+
+  .blog-prose {
+    color: var(--color-foreground);
+    line-height: 1.75;
+    font-size: 1.0625rem;
+  }
+
+  .blog-prose h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .blog-prose h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .blog-prose p {
     margin-bottom: 1rem;
   }
 
-  /* Contact info cards mobile */
-  .contact-section .rounded-2xl {
-    padding: 1.5rem !important;
+  .blog-prose ul,
+  .blog-prose ol {
+    margin: 0 0 1rem 1.25rem;
   }
 
-  /* Service cards mobile */
-  .services-section .rounded-2xl {
-    width: 100%;
-    max-width: 100%;
+  .blog-prose li {
+    margin-bottom: 0.35rem;
+  }
+
+  .blog-prose a {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .blog-prose strong {
+    font-weight: 700;
+  }
+
+  /* Mobile Responsive Styles */
+  @media (max-width: 640px) {
+    .hero-section {
+      min-height: 100vh;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      padding: 0.75rem 1.5rem;
+      font-size: 0.9rem;
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .contact-section iframe {
+      height: 300px !important;
+      min-height: 300px;
+    }
+
+    .modal-content {
+      margin: 0.5rem;
+      max-height: 95vh;
+    }
+
+    .services-section .rounded-2xl {
+      width: 100%;
+      max-width: 100%;
+    }
   }
 }
-
-@media (max-width: 768px) {
-  /* Tablet adjustments */
-  .services-section,
-  .contact-section {
-    padding: 4rem 1.5rem !important;
-  }
-}
-

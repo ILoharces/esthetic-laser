@@ -22,13 +22,27 @@ pnpm dev
 yarn dev
 ```
 
-3. Abre tu navegador en `http://localhost:5173`
+3. Abre tu navegador en `http://localhost:4321`
 
 ## Scripts disponibles
 
-- `npm run dev` - Inicia el servidor de desarrollo
+- `npm run dev` - Inicia el servidor de desarrollo (Astro)
 - `npm run build` - Construye la aplicación para producción
 - `npm run preview` - Previsualiza la build de producción
+
+## Blog y panel `/admin`
+
+Los artículos viven en `content/blog/` (Markdown). La guía para la clienta está en `content/blog/README.md`.
+
+Tras desplegar en Netlify:
+
+1. **Project configuration > Identity**: Enable Identity. Registration: **Invite only**.
+2. **Identity > Services > Git Gateway**: Enable Git Gateway (misma rama que producción, `main`).
+3. Las plantillas de email personalizadas son de plan Pro. En el plan gratuito, el enlace de invitación abre la home; el widget redirige a `/admin`. Si no, cambia la URL a `https://dominio/admin/#invite_token=...`.
+4. **Identity > Users > Invite users**: invita tu email y el de la editora.
+5. Entra en `https://dominio/admin`, inicia sesión y publica. Netlify rebuilds en 1–3 minutos.
+
+Search Console (cuando el blog esté en el aire): verifica el dominio y envía `https://yoliestheticlaser.com/sitemap-index.xml`.
 
 ## Configuración de EmailJS
 
@@ -69,10 +83,10 @@ Para que el formulario de reserva funcione, necesitas configurar EmailJS:
 
 ## Tecnologías
 
-- React 18
+- Astro + React 18
 - TypeScript
-- Vite
 - Tailwind CSS v4
 - Lucide React (iconos)
 - EmailJS (envío de formularios)
+- Decap CMS (panel `/admin`)
 

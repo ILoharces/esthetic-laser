@@ -1,4 +1,10 @@
+/// <reference types="astro/client" />
 /// <reference types="vite/client" />
+
+declare module '*.yml?raw' {
+  const content: string;
+  export default content;
+}
 
 declare module '*.jpg' {
   const src: string;

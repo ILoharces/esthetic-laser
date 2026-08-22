@@ -1,0 +1,73 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { Sidebar } from '../../app/components/Sidebar';
+import { SITE, formatPostDate } from '../../lib/site';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+
+const title = `Blog de estética en Pamplona | ${SITE.name}`;
+const description =
+  'Artículos sobre depilación láser diodo, presoterapia e Hydroface en Pamplona. Consejos y novedades de Esthetic Laser.';
+---
+
+<BaseLayout title={title} description={description}>
+  <Sidebar client:load currentPage="blog" />
+
+  <main class="min-h-screen" style="background-color: var(--color-secondary)">
+    <section class="px-4 sm:px-6 lg:px-8 pt-24 pb-12 sm:pt-28 sm:pb-16">
+      <div class="w-full max-w-5xl mx-auto">
+          <header class="text-center mb-10 sm:mb-12">
+          <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4">
+            Blog
+          </h1>
+          <div class="w-24 h-1 bg-primary mx-auto rounded-full mb-4"></div>
+          <p class="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
+            Consejos y novedades de estética profesional en Pamplona
+          </p>
+        </header>
+
+        {posts.length === 0 ? (
+          <p class="text-center text-muted-foreground">Pronto publicaremos el primer artículo.</p>
+        ) : (
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            {posts.map((post) => (
+              <li>
+                <a
+                  href={`/blog/${post.id}`}
+                  class="group block rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-primary/10 hover:border-primary/30 overflow-hidden h-full"
+                  style="background-color: var(--color-secondary)"
+                >
+                  <div class="relative h-52 sm:h-60 overflow-hidden">
+                    <img
+                      src={post.data.cover}
+                      alt={post.data.coverAlt}
+                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div class="absolute inset-0 bg-linear-to-t from-black/60 via-black/15 to-transparent"></div>
+                  </div>
+                  <div class="p-5 sm:p-6">
+                    <time
+                      datetime={post.data.date.toISOString()}
+                      class="text-sm text-muted-foreground"
+                    >
+                      {formatPostDate(post.data.date)}
+                    </time>
+                    <h2 class="text-xl sm:text-2xl font-bold text-foreground mt-2 mb-3 group-hover:text-primary transition-colors">
+                      {post.data.title}
+                    </h2>
+                    <p class="text-foreground/70 leading-relaxed">
+                      {post.data.description}
+                    </p>
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </section>
+  </main>
+</BaseLayout>

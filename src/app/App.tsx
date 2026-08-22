@@ -3,6 +3,8 @@ import { MapPin, Phone, Mail, Clock, X, ChevronLeft, ChevronRight, Heart } from 
 import emailjs from '@emailjs/browser';
 import useEmblaCarousel from 'embla-carousel-react';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
+import { ImageViewerModal } from './components/ImageViewerModal';
+import { Sidebar } from './components/Sidebar';
 import pricesData from './resources/pricesDepilacion.json';
 // Import local images
 import presoterapiaImg from './resources/presoterapia.jpg';
@@ -77,6 +79,19 @@ export default function App() {
     emblaApi.on('reInit', onSelect);
     emblaApi.on('select', onSelect);
   }, [emblaApi, onSelect]);
+
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+      requestAnimationFrame(() => {
+        document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('reservar') === '1') {
+      setIsBookingModalOpen(true);
+    }
+  }, []);
 
   // Autoplay functionality
   useEffect(() => {
@@ -258,6 +273,7 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
 
   return (
     <div className="min-h-screen w-full relative" style={{ backgroundColor: 'var(--color-secondary)' }}>
+      <Sidebar onBookAppointment={() => setIsBookingModalOpen(true)} />
 
       {isSanValentinPeriod && (
         <button
@@ -274,23 +290,23 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
         </button>
       )}
 
-      <section className="hero-section min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden w-full" style={{ backgroundColor: 'var(--color-secondary)', zIndex: 10 }}>
+      <section id="inicio" className="hero-section min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden w-full" style={{ backgroundColor: 'var(--color-secondary)', zIndex: 10 }}>
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" style={{ zIndex: 10 }}></div>
         <div className="w-full text-center relative animate-fade-in-up" style={{ zIndex: 20 }}>
-          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-primary mb-6 sm:mb-8 leading-tight tracking-tight px-2">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-primary mb-6 sm:mb-8 leading-tight tracking-tight">
             Esthetic Laser
           </h1>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 sm:mb-6 leading-tight px-2">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 sm:mb-6 leading-tight">
             Depilación Láser Diodo Pamplona
             <span className="block text-primary mt-2">Profesional</span>
           </h2>
-          <div className="w-full flex justify-center px-4">
+          <div className="w-full flex justify-center">
             <p className="max-w-3xl text-base sm:text-lg text-muted-foreground mb-6 sm:mb-8 leading-relaxed">
               Descubre nuestros tratamientos de última generación en el corazón de Pamplona.
               Profesionalidad, tecnología avanzada y resultados garantizados.
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
             <button
               className="btn-primary w-full sm:w-auto"
               onClick={() => setIsBookingModalOpen(true)}
@@ -313,7 +329,7 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
       <div className="section-separator w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
 
       {/* Carousel Section */}
-      <section className="carousel-section py-8 sm:py-10 md:py-12 px-4 sm:px-6 lg:px-12 xl:px-16 w-full relative" style={{ backgroundColor: 'var(--color-secondary)', zIndex: 10 }}>
+      <section id="galeria" className="carousel-section py-6 sm:py-8 md:py-10 px-4 sm:px-6 lg:px-8 w-full relative" style={{ backgroundColor: 'var(--color-secondary)', zIndex: 10 }}>
         <div className="w-full max-w-6xl mx-auto">
           <div className="relative">
             <div className="overflow-hidden rounded-2xl shadow-xl border border-primary/10" ref={emblaRef}>
@@ -373,14 +389,14 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
       <div className="section-separator w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
 
       {/* Services Grid */}
-      <section id="servicios" className="services-section py-12 sm:py-16 md:py-24 px-4 sm:px-6 lg:px-12 xl:px-16 w-full relative" style={{ backgroundColor: 'var(--color-secondary)', zIndex: 10 }}>
+      <section id="servicios" className="services-section py-10 sm:py-12 md:py-16 px-4 sm:px-6 lg:px-8 w-full relative" style={{ backgroundColor: 'var(--color-secondary)', zIndex: 10 }}>
         <div className="w-full max-w-7xl mx-auto">
-          <div className="text-center mb-8 sm:mb-12 md:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 px-2">
+          <div className="text-center mb-8 sm:mb-10 md:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
               Nuestros Servicios
             </h2>
             <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
-            <p className="text-muted-foreground text-base sm:text-lg mt-4 sm:mt-6 max-w-2xl mx-auto px-4">
+            <p className="text-muted-foreground text-base sm:text-lg mt-4 sm:mt-6 max-w-2xl mx-auto">
               Tratamientos personalizados con la más alta tecnología para cuidar de tu belleza
             </p>
           </div>
@@ -475,21 +491,21 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
       <div className="section-separator w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent"></div>
 
       {/* Contact & Location Section */}
-      <section className="contact-section py-12 sm:py-16 md:py-24 px-4 sm:px-6 lg:px-12 xl:px-16 w-full relative" style={{ backgroundColor: 'var(--color-secondary)', zIndex: 10 }}>
+      <section id="contacto" className="contact-section py-10 sm:py-12 md:py-16 px-4 sm:px-6 lg:px-8 w-full relative" style={{ backgroundColor: 'var(--color-secondary)', zIndex: 10 }}>
         <div className="w-full max-w-7xl mx-auto">
-          <div className="text-center mb-8 sm:mb-12 md:mb-16 mt-4 sm:mt-8">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 px-2">Visítanos</h2>
+          <div className="text-center mb-8 sm:mb-10 md:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">Visítanos</h2>
             <div className="w-24 h-1 bg-primary mx-auto rounded-full mb-4"></div>
-            <p className="text-muted-foreground text-base sm:text-lg px-4">Estamos aquí para cuidar de ti</p>
+            <p className="text-muted-foreground text-base sm:text-lg">Estamos aquí para cuidar de ti</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
             {/* Contact Info */}
-            <div className="space-y-6 sm:space-y-8">
-              <div className="rounded-2xl p-4 sm:p-6 md:p-10 shadow-xl border border-primary/10 hover:shadow-2xl transition-shadow duration-300" style={{ backgroundColor: 'var(--color-secondary)' }}>
-                <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-6 sm:mb-8 text-center">Información de Contacto</h3>
+            <div className="space-y-6">
+              <div className="rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl border border-primary/10 hover:shadow-2xl transition-shadow duration-300" style={{ backgroundColor: 'var(--color-secondary)' }}>
+                <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-6 text-center">Información de Contacto</h3>
 
-                <div className="space-y-6 sm:space-y-8">
+                <div className="space-y-6">
                   <div className="flex flex-col items-center gap-4 group text-center">
                     <div className="p-4 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl group-hover:from-primary/20 group-hover:to-primary/10 transition-all duration-300">
                       <MapPin className="w-6 h-6 text-primary" />
@@ -538,7 +554,7 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
                 </div>
 
                 <button
-                  className="mt-6 sm:mt-8 md:mt-10 w-full btn-primary"
+                  className="mt-6 w-full btn-primary"
                   onClick={() => setIsBookingModalOpen(true)}
                 >
                   Reservar Cita
@@ -568,233 +584,66 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
 
       {/* --- MODAL DE PRECIOS DE DEPILACIÓN --- */}
       {isModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
-          onClick={() => setIsModalOpen(false)}
-        >
-          <div
-            className="relative w-full max-w-4xl max-h-[85vh] flex flex-col rounded-3xl shadow-2xl overflow-hidden"
-            style={{ backgroundColor: 'var(--color-secondary)' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header Fijo */}
-            <div className="flex items-center justify-between px-6 py-5 sm:px-10 sm:py-7 border-b border-primary/10">
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground">Precios de Depilación Láser</h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-primary/10 rounded-full transition-colors">
-                <X className="w-6 h-6" />
+        <ImageViewerModal
+          title="Precios de Depilación Láser"
+          src={
+            activeTab === 'chica'
+              ? `https://res.cloudinary.com/dlddss5wv/image/upload/v1769547953/bonos_chica_oj6n9e.jpg?_cb=${depilacionImageKey}`
+              : `https://res.cloudinary.com/dlddss5wv/image/upload/v1769547947/bonos_chico_reazdm.jpg?_cb=${depilacionImageKey}`
+          }
+          alt={activeTab === 'chica' ? 'Bonos chica' : 'Bonos chico'}
+          onClose={() => setIsModalOpen(false)}
+          toolbar={
+            <div className="shrink-0 flex gap-4 px-4 sm:px-6 border-b border-primary/10">
+              <button
+                onClick={() => setActiveTab('chica')}
+                className={`flex-1 pb-3 font-semibold border-b-2 transition-colors ${activeTab === 'chica' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'}`}
+              >
+                Bonos chica
+              </button>
+              <button
+                onClick={() => setActiveTab('chico')}
+                className={`flex-1 pb-3 font-semibold border-b-2 transition-colors ${activeTab === 'chico' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'}`}
+              >
+                Bonos chico
               </button>
             </div>
-
-            {/* Contenido con Scroll y Padding Interno */}
-            <div className="flex-1 overflow-y-auto p-6 sm:p-10">
-              <div className="flex gap-4 border-b border-primary/10 mb-8">
-                <button
-                  onClick={() => setActiveTab('chica')}
-                  className={`flex-1 pb-4 font-semibold border-b-2 transition-colors ${activeTab === 'chica' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'}`}
-                >
-                  Bonos chica
-                </button>
-                <button
-                  onClick={() => setActiveTab('chico')}
-                  className={`flex-1 pb-4 font-semibold border-b-2 transition-colors ${activeTab === 'chico' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'}`}
-                >
-                  Bonos chico
-                </button>
-              </div>
-
-              <div className="flex justify-center items-center w-full">
-                <ImageWithFallback
-                  key={`depilacion-${activeTab}-${depilacionImageKey}`}
-                  src={activeTab === 'chica' 
-                    ? `https://res.cloudinary.com/dlddss5wv/image/upload/v1769547953/bonos_chica_oj6n9e.jpg?_cb=${depilacionImageKey}`
-                    : `https://res.cloudinary.com/dlddss5wv/image/upload/v1769547947/bonos_chico_reazdm.jpg?_cb=${depilacionImageKey}`
-                  }
-                  alt={activeTab === 'chica' ? 'Bonos chica' : 'Bonos chico'}
-                  className="max-w-full max-h-[calc(95vh-200px)] w-auto h-auto object-contain rounded-lg"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+          }
+        />
       )}
 
-      {/* Modal de Presoterapia */}
       {isPresoterapiaModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-          onClick={() => setIsPresoterapiaModalOpen(false)}
-        >
-          <div
-            className="relative w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-2xl shadow-2xl m-2 sm:m-4"
-            style={{ backgroundColor: 'var(--color-secondary)' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header del Modal */}
-            <div className="sticky top-0 z-10 flex items-center justify-between px-6 sm:px-8 md:px-10 py-5 sm:py-6 md:py-7 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground pr-2">Presoterapia</h2>
-              <button
-                onClick={() => setIsPresoterapiaModalOpen(false)}
-                className="p-2 rounded-full hover:bg-primary/10 transition-colors"
-                aria-label="Cerrar"
-              >
-                <X className="w-6 h-6 text-foreground" />
-              </button>
-            </div>
-
-            {/* Contenido del Modal */}
-            <div className="px-6 sm:px-8 md:px-10 lg:px-12 py-6 sm:py-8 md:py-10">
-              <div className="flex justify-center items-center w-full">
-                <ImageWithFallback
-                  key={`presoterapia-${presoterapiaImageKey}`}
-                  src={`https://res.cloudinary.com/dlddss5wv/image/upload/v1769537090/oferta1_dya8qc.jpg?_cb=${presoterapiaImageKey}`}
-                  alt="Presoterapia"
-                  className="max-w-full max-h-[calc(95vh-200px)] w-auto h-auto object-contain rounded-lg"
-                />
-              </div>
-            </div>
-
-            {/* Footer del Modal */}
-            <div className="sticky bottom-0 px-6 sm:px-8 md:px-10 lg:px-12 py-5 sm:py-6 md:py-7 border-t border-primary/20 flex justify-end" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <button
-                className="btn-primary text-sm sm:text-base"
-                onClick={() => setIsPresoterapiaModalOpen(false)}
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
+        <ImageViewerModal
+          title="Presoterapia"
+          src={`https://res.cloudinary.com/dlddss5wv/image/upload/v1769537090/oferta1_dya8qc.jpg?_cb=${presoterapiaImageKey}`}
+          alt="Presoterapia"
+          onClose={() => setIsPresoterapiaModalOpen(false)}
+        />
       )}
 
-      {/* Modal de Hydroface */}
       {isHydrofaceModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-          onClick={() => setIsHydrofaceModalOpen(false)}
-        >
-          <div
-            className="relative w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-2xl shadow-2xl m-2 sm:m-4"
-            style={{ backgroundColor: 'var(--color-secondary)' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header del Modal */}
-            <div className="sticky top-0 z-10 flex items-center justify-between px-6 sm:px-8 md:px-10 py-5 sm:py-6 md:py-7 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground pr-2">Hydroface</h2>
-              <button
-                onClick={() => setIsHydrofaceModalOpen(false)}
-                className="p-2 rounded-full hover:bg-primary/10 transition-colors"
-                aria-label="Cerrar"
-              >
-                <X className="w-6 h-6 text-foreground" />
-              </button>
-            </div>
-
-            {/* Contenido del Modal */}
-            <div className="px-6 sm:px-8 md:px-10 lg:px-12 py-6 sm:py-8 md:py-10">
-              <div className="flex justify-center items-center w-full">
-                <ImageWithFallback
-                  key={`hydroface-${hydrofaceImageKey}`}
-                  src={`https://res.cloudinary.com/dlddss5wv/image/upload/v1769537216/oferta2_jydxqc.jpg?_cb=${hydrofaceImageKey}`}
-                  alt="Hydroface"
-                  className="max-w-full max-h-[calc(95vh-200px)] w-auto h-auto object-contain rounded-lg"
-                />
-              </div>
-            </div>
-
-            {/* Footer del Modal */}
-            <div className="sticky bottom-0 px-6 sm:px-8 md:px-10 lg:px-12 py-5 sm:py-6 md:py-7 border-t border-primary/20 flex justify-end" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <button
-                className="btn-primary text-sm sm:text-base"
-                onClick={() => setIsHydrofaceModalOpen(false)}
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
+        <ImageViewerModal
+          title="Hydroface"
+          src={`https://res.cloudinary.com/dlddss5wv/image/upload/v1769537216/oferta2_jydxqc.jpg?_cb=${hydrofaceImageKey}`}
+          alt="Hydroface"
+          onClose={() => setIsHydrofaceModalOpen(false)}
+        />
       )}
 
-      {/* Modal de Ofertas: dos imágenes con flechas (siempre disponible al abrir desde la sección ofertas) */}
       {isValentinModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-          onClick={() => setIsValentinModalOpen(false)}
-        >
-          <div
-            className="relative w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-2xl shadow-2xl m-2 sm:m-4"
-            style={{ backgroundColor: 'var(--color-secondary)' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header del Modal */}
-            <div className="sticky top-0 z-10 flex items-center justify-between px-6 sm:px-8 md:px-10 py-5 sm:py-6 md:py-7 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground pr-2">
-                {isSanValentinPeriod ? 'Ofertas de San Valentin' : 'Ofertas'}
-              </h2>
-              <button
-                onClick={() => setIsValentinModalOpen(false)}
-                className="p-2 rounded-full hover:bg-primary/10 transition-colors"
-                aria-label="Cerrar"
-              >
-                <X className="w-6 h-6 text-foreground" />
-              </button>
-            </div>
-
-            {/* Contenido: imagen actual con flechas */}
-            <div className="px-6 sm:px-8 md:px-10 lg:px-12 py-6 sm:py-8 md:py-10 relative">
-              <div className="flex justify-center items-center w-full min-h-[200px] relative">
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setOfertasImageIndex((i) => (i === 0 ? ofertasImages.length - 1 : i - 1)); }}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 hover:bg-white shadow-lg border border-primary/20 z-10"
-                  aria-label="Imagen anterior"
-                >
-                  <ChevronLeft className="w-5 h-5 text-primary" />
-                </button>
-                <ImageWithFallback
-                  key={`ofertas-${valentinImageKey}-${ofertasImageIndex}`}
-                  src={`${ofertasImages[ofertasImageIndex]}?_cb=${valentinImageKey}`}
-                  alt={`Oferta ${ofertasImageIndex + 1}`}
-                  className="max-w-full max-h-[calc(95vh-200px)] w-auto h-auto object-contain rounded-lg"
-                />
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setOfertasImageIndex((i) => (i === ofertasImages.length - 1 ? 0 : i + 1)); }}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 hover:bg-white shadow-lg border border-primary/20 z-10"
-                  aria-label="Imagen siguiente"
-                >
-                  <ChevronRight className="w-5 h-5 text-primary" />
-                </button>
-              </div>
-              <div className="flex justify-center gap-2 mt-4">
-                {ofertasImages.map((_, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); setOfertasImageIndex(index); }}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      ofertasImageIndex === index ? 'bg-primary w-6' : 'bg-primary/30 w-1.5'
-                    }`}
-                    aria-label={`Ir a imagen ${index + 1}`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Footer del Modal */}
-            <div className="sticky bottom-0 px-6 sm:px-8 md:px-10 lg:px-12 py-5 sm:py-6 md:py-7 border-t border-primary/20 flex justify-end" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <button
-                className="btn-primary text-sm sm:text-base"
-                onClick={() => setIsValentinModalOpen(false)}
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
+        <ImageViewerModal
+          title={isSanValentinPeriod ? 'Ofertas de San Valentin' : 'Ofertas'}
+          src={`${ofertasImages[ofertasImageIndex]}?_cb=${valentinImageKey}`}
+          alt={`Oferta ${ofertasImageIndex + 1}`}
+          onClose={() => setIsValentinModalOpen(false)}
+          carousel={{
+            index: ofertasImageIndex,
+            total: ofertasImages.length,
+            onPrev: () => setOfertasImageIndex((i) => (i === 0 ? ofertasImages.length - 1 : i - 1)),
+            onNext: () => setOfertasImageIndex((i) => (i === ofertasImages.length - 1 ? 0 : i + 1)),
+            onSelect: setOfertasImageIndex,
+          }}
+        />
       )}
 
       {/* Modal de Reserva de Cita */}
@@ -1130,16 +979,16 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
       )}
 
       {/* Footer */}
-      <footer className="footer-section bg-gradient-to-br from-primary to-primary-dark text-primary-foreground py-8 sm:py-10 md:py-12 px-4 sm:px-6 lg:px-8 w-full">
+      <footer className="footer-section bg-gradient-to-br from-primary to-primary-dark text-primary-foreground py-8 sm:py-10 px-4 sm:px-6 lg:px-8 w-full">
         <div className="w-full mx-auto">
           <div className="text-center">
             <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Esthetic Laser</h3>
-            <p className="text-sm sm:text-base text-primary-foreground/90 mb-4 sm:mb-6 max-w-md mx-auto px-2">
+            <p className="text-sm sm:text-base text-primary-foreground/90 mb-4 sm:mb-6 max-w-md mx-auto">
               Tu centro de belleza y estética profesional en Pamplona
             </p>
             <div className="w-24 h-1 bg-white/30 mx-auto rounded-full mb-4 sm:mb-6"></div>
-            <p className="text-xs sm:text-sm mb-2 font-medium px-2">© 2024 Esthetic Laser - Todos los derechos reservados</p>
-            <p className="text-xs sm:text-sm text-primary-foreground/80 px-2">Ctra San Sebastian, km 1, 31013 Pamplona, Navarra</p>
+            <p className="text-xs sm:text-sm mb-2 font-medium">© 2024 Esthetic Laser - Todos los derechos reservados</p>
+            <p className="text-xs sm:text-sm text-primary-foreground/80">Ctra San Sebastian, km 1, 31013 Pamplona, Navarra</p>
           </div>
         </div>
       </footer>
