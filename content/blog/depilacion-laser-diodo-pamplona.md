@@ -1,6 +1,7 @@
 ---
-title: Depilación láser diodo en Pamplona
-description: Cómo funciona la depilación láser diodo, para quién es y qué esperar en Esthetic Laser, en Pamplona (Ctra. San Sebastián / Eroski).
+title: Depilación láser diodo en Pamplonaa
+description: Cómo funciona la depilación láser diodo, para quién es y qué
+  esperar en Esthetic Laser, en Pamplona (Ctra. San Sebastián / Eroski).
 date: 2026-08-22
 cover: https://images.unsplash.com/photo-1700760933574-9f0f4ea9aa3b?w=1200&q=80&fit=crop
 coverAlt: Tratamiento de depilación láser diodo en un centro de estética
