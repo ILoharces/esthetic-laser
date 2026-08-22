@@ -1,7 +1,13 @@
 import { useState, useEffect } from 'react';
 
+type ImageSrc = string | { src: string };
+
+function resolveSrc(src: ImageSrc): string {
+  return typeof src === 'string' ? src : src.src;
+}
+
 interface ImageWithFallbackProps {
-  src: string;
+  src: ImageSrc;
   alt: string;
   className?: string;
   fallbackSrc?: string;
@@ -15,7 +21,8 @@ export function ImageWithFallback({
   fallbackSrc = 'https://via.placeholder.com/400x300?text=Imagen+no+disponible',
   cacheBust = false
 }: ImageWithFallbackProps) {
-  const [imgSrc, setImgSrc] = useState(src);
+  const resolved = resolveSrc(src);
+  const [imgSrc, setImgSrc] = useState(resolved);
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
@@ -23,20 +30,20 @@ export function ImageWithFallback({
     setHasError(false);
     
     // Add cache-busting parameter if enabled
-    if (cacheBust && src) {
+    if (cacheBust && resolved) {
       try {
-        const url = new URL(src);
+        const url = new URL(resolved, window.location.origin);
         // Cloudinary URLs - add cache busting parameter
         url.searchParams.set('_cb', Date.now().toString());
         setImgSrc(url.toString());
       } catch (e) {
         // If URL parsing fails, use src as is
-        setImgSrc(src);
+        setImgSrc(resolved);
       }
     } else {
-      setImgSrc(src);
+      setImgSrc(resolved);
     }
-  }, [src, cacheBust]);
+  }, [resolved, cacheBust]);
 
   const handleError = () => {
     if (!hasError) {
