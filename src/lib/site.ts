@@ -7,6 +7,8 @@ export const SITE = {
   phone: '682193535',
   phoneDisplay: '682 19 35 35',
   email: 'info@yoliestheticlaser.com',
+  whatsappBookingUrl:
+    'https://wa.me/34682193535?text=Hola%2C%20quiero%20reservar%20una%20cita',
   street: 'Ctra San Sebastian, km 1',
   locality: 'Pamplona',
   region: 'Navarra',

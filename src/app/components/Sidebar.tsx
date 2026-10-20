@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Home, Images, MapPin, Menu, Newspaper, Sparkles, X } from 'lucide-react';
+import { SITE } from '../../lib/site';
 
 const SECTION_ITEMS = [
   { id: 'inicio', label: 'Inicio', icon: Home },
@@ -9,11 +10,10 @@ const SECTION_ITEMS = [
 ] as const;
 
 interface SidebarProps {
-  onBookAppointment?: () => void;
   currentPage?: 'home' | 'blog';
 }
 
-export function Sidebar({ onBookAppointment, currentPage = 'home' }: SidebarProps) {
+export function Sidebar({ currentPage = 'home' }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState(
     currentPage === 'blog' ? 'blog' : 'inicio'
@@ -42,15 +42,6 @@ export function Sidebar({ onBookAppointment, currentPage = 'home' }: SidebarProp
     }
     window.location.href = '/blog';
   }, [currentPage]);
-
-  const goReserve = useCallback(() => {
-    close();
-    if (onBookAppointment) {
-      onBookAppointment();
-      return;
-    }
-    window.location.href = '/?reservar=1';
-  }, [close, onBookAppointment]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -164,9 +155,15 @@ export function Sidebar({ onBookAppointment, currentPage = 'home' }: SidebarProp
         </nav>
 
         <div className="px-4 pb-6 pt-4 border-t border-primary/10">
-          <button type="button" className="btn-primary w-full" onClick={goReserve}>
+          <a
+            href={SITE.whatsappBookingUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary w-full"
+            onClick={close}
+          >
             Reservar Cita
-          </button>
+          </a>
         </div>
       </aside>
     </>

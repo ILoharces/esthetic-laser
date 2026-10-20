@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { MapPin, Phone, Mail, Clock, X, ChevronLeft, ChevronRight, Heart } from 'lucide-react';
-import emailjs from '@emailjs/browser';
+import { MapPin, Phone, Mail, Clock, ChevronLeft, ChevronRight, Heart } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { ImageWithFallback } from './components/figma/ImageWithFallback';
 import { ImageViewerModal } from './components/ImageViewerModal';
 import { Sidebar } from './components/Sidebar';
-import pricesData from './resources/pricesDepilacion.json';
+import { SITE } from '../lib/site';
 // Import local images
 import presoterapiaImg from './resources/presoterapia.jpg';
 import valentinImg from './resources/valentin.jpg';
@@ -19,7 +18,6 @@ export default function App() {
   const [isPresoterapiaModalOpen, setIsPresoterapiaModalOpen] = useState(false);
   const [isHydrofaceModalOpen, setIsHydrofaceModalOpen] = useState(false);
   const [isValentinModalOpen, setIsValentinModalOpen] = useState(false);
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'chico' | 'chica'>('chica');
   const [presoterapiaImageKey, setPresoterapiaImageKey] = useState(Date.now());
   const [hydrofaceImageKey, setHydrofaceImageKey] = useState(Date.now());
@@ -34,20 +32,6 @@ export default function App() {
   // Imagen fiable para la tarjeta de Ofertas cuando no es San Valentín (Unsplash CDN)
   const ofertasCardImage =
     'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1080&q=80&fit=crop';
-
-  // Form state
-  const [formData, setFormData] = useState({
-    fullName: '',
-    contactType: 'email' as 'email' | 'phone',
-    email: '',
-    phone: '',
-    selectedServices: [] as string[],
-    depilacionSelections: [] as Array<{ tipo: 'chica' | 'chico', zona: string, sesiones: number, precio: number }>,
-  });
-
-  // Email sending state
-  const [isSending, setIsSending] = useState(false);
-  const [sendStatus, setSendStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   // Carousel state
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
@@ -86,10 +70,6 @@ export default function App() {
       requestAnimationFrame(() => {
         document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth' });
       });
-    }
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('reservar') === '1') {
-      setIsBookingModalOpen(true);
     }
   }, []);
 
@@ -142,114 +122,6 @@ export default function App() {
     wasSanValentinPeriod.current = isSanValentinPeriod;
   }, [isSanValentinPeriod, isValentinModalOpen]);
 
-  // Función para formatear las selecciones de depilación
-  const formatDepilacionSelections = () => {
-    if (formData.depilacionSelections.length === 0) return 'Ninguna selección';
-
-    const grouped = formData.depilacionSelections.reduce((acc, sel) => {
-      const key = `${sel.tipo}-${sel.zona}`;
-      if (!acc[key]) {
-        acc[key] = { tipo: sel.tipo, zona: sel.zona, opciones: [] };
-      }
-      acc[key].opciones.push(`${sel.sesiones} sesión${sel.sesiones > 1 ? 'es' : ''} - €${sel.precio}`);
-      return acc;
-    }, {} as Record<string, { tipo: string, zona: string, opciones: string[] }>);
-
-    return Object.values(grouped).map(group => {
-      const tipoLabel = group.tipo === 'chica' ? 'Pack Bonos Chica' : 'Pack Bonos Chico';
-      return `${tipoLabel} - ${group.zona}:\n${group.opciones.join(', ')}`;
-    }).join('\n\n');
-  };
-
-  // Función para enviar el formulario
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSending(true);
-    setSendStatus('idle');
-
-    try {
-      // Formatear los servicios seleccionados
-      const serviciosText = formData.selectedServices.join(', ');
-
-      // Formatear las selecciones de depilación
-      const depilacionText = formData.depilacionSelections.length > 0
-        ? formatDepilacionSelections()
-        : 'Ninguna selección específica';
-
-      // Información de contacto
-      const contacto = formData.contactType === 'email'
-        ? `Email: ${formData.email}`
-        : `Teléfono: ${formData.phone}`;
-
-      // Preparar el mensaje
-      const message = `
-Nueva Reserva de Cita
-
-Nombre completo: ${formData.fullName}
-${contacto}
-
-Servicios seleccionados: ${serviciosText}
-
-${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depilación Láser:\n${depilacionText}` : ''}
-      `.trim();
-
-      // Configuración de EmailJS
-      // NOTA: Configura estas variables de entorno en un archivo .env
-      // VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, VITE_EMAILJS_PUBLIC_KEY
-      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-
-      // Validar que las credenciales estén configuradas
-      if (!serviceId || !templateId || !publicKey ||
-        serviceId === 'YOUR_SERVICE_ID' ||
-        templateId === 'YOUR_TEMPLATE_ID' ||
-        publicKey === 'YOUR_PUBLIC_KEY') {
-        throw new Error('Las credenciales de EmailJS no están configuradas. Por favor, configura las variables de entorno VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID y VITE_EMAILJS_PUBLIC_KEY');
-      }
-
-      // Parámetros del template de EmailJS
-      // Asegúrate de que tu template en EmailJS tenga estos campos
-      const templateParams = {
-        to_email: 'info@yoliestheticlaser.com',
-        from_name: formData.fullName,
-        from_email: formData.contactType === 'email' ? formData.email : 'no-email@example.com',
-        phone: formData.contactType === 'phone' ? formData.phone : '',
-        message: message,
-        subject: 'Nueva Reserva de Cita - Esthetic Laser',
-      };
-
-      await emailjs.send(
-        serviceId,
-        templateId,
-        templateParams,
-        publicKey
-      );
-
-      setSendStatus('success');
-
-      // Limpiar el formulario después de 2 segundos
-      setTimeout(() => {
-        setFormData({
-          fullName: '',
-          contactType: 'email',
-          email: '',
-          phone: '',
-          selectedServices: [],
-          depilacionSelections: [],
-        });
-        setSendStatus('idle');
-        setIsBookingModalOpen(false);
-      }, 2000);
-
-    } catch (error) {
-      console.error('Error al enviar el formulario:', error);
-      setSendStatus('error');
-    } finally {
-      setIsSending(false);
-    }
-  };
-
   const services = [
     {
       id: 1,
@@ -273,7 +145,7 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
 
   return (
     <div className="min-h-screen w-full relative" style={{ backgroundColor: 'var(--color-secondary)' }}>
-      <Sidebar onBookAppointment={() => setIsBookingModalOpen(true)} />
+      <Sidebar />
 
       {isSanValentinPeriod && (
         <button
@@ -307,12 +179,14 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
-            <button
+            <a
               className="btn-primary w-full sm:w-auto"
-              onClick={() => setIsBookingModalOpen(true)}
+              href={SITE.whatsappBookingUrl}
+              target="_blank"
+              rel="noopener noreferrer"
             >
               Reservar Cita
-            </button>
+            </a>
             <button
               className="btn-secondary w-full sm:w-auto"
               onClick={() => {
@@ -553,12 +427,14 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
                   </div>
                 </div>
 
-                <button
+                <a
                   className="mt-6 w-full btn-primary"
-                  onClick={() => setIsBookingModalOpen(true)}
+                  href={SITE.whatsappBookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   Reservar Cita
-                </button>
+                </a>
               </div>
             </div>
 
@@ -644,338 +520,6 @@ ${formData.selectedServices.includes('Depilación Láser') ? `Detalles de Depila
             onSelect: setOfertasImageIndex,
           }}
         />
-      )}
-
-      {/* Modal de Reserva de Cita */}
-      {isBookingModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-          onClick={() => setIsBookingModalOpen(false)}
-        >
-          <div
-            className="relative w-full max-w-2xl my-2 sm:my-4 max-h-[calc(100vh-1rem)] sm:max-h-[95vh] overflow-y-auto rounded-2xl shadow-2xl"
-            style={{ backgroundColor: 'var(--color-secondary)' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header del Modal */}
-            <div className="sticky top-0 z-10 flex items-center justify-between px-6 sm:px-8 md:px-10 lg:px-12 py-5 sm:py-6 md:py-7 border-b border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
-              <h2 className="text-xl sm:text-2xl font-bold text-foreground">Reservar Cita</h2>
-              <button
-                onClick={() => setIsBookingModalOpen(false)}
-                className="p-2 rounded-full hover:bg-primary/10 transition-colors"
-                aria-label="Cerrar"
-              >
-                <X className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
-              </button>
-            </div>
-
-            <form
-              className="px-6 sm:px-8 md:px-10 lg:px-12 py-6 sm:py-8 md:py-10 space-y-5 sm:space-y-6"
-              onSubmit={handleSubmit}
-            >
-              {/* Campo Nombre Completo */}
-              <div className="space-y-2">
-                <label htmlFor="fullName" className="block text-sm sm:text-base font-semibold text-foreground">
-                  Nombre completo *
-                </label>
-                <input
-                  type="text"
-                  id="fullName"
-                  required
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  className="w-full px-4 py-2.5 sm:py-3 rounded-lg border border-primary/20 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                  style={{ backgroundColor: 'var(--color-secondary)' }}
-                  placeholder="Ingresa tu nombre completo"
-                />
-              </div>
-
-              {/* Selección de tipo de contacto */}
-              <div className="space-y-2">
-                <label className="block text-sm sm:text-base font-semibold text-foreground mb-3">
-                  Contacto *
-                </label>
-                <div className="flex gap-4 mb-3">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="contactType"
-                      value="email"
-                      checked={formData.contactType === 'email'}
-                      onChange={() => setFormData({ ...formData, contactType: 'email', phone: '' })}
-                      className="w-4 h-4 text-primary focus:ring-primary"
-                    />
-                    <span className="text-sm sm:text-base text-foreground">Correo electrónico</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="contactType"
-                      value="phone"
-                      checked={formData.contactType === 'phone'}
-                      onChange={() => setFormData({ ...formData, contactType: 'phone', email: '' })}
-                      className="w-4 h-4 text-primary focus:ring-primary"
-                    />
-                    <span className="text-sm sm:text-base text-foreground">Teléfono</span>
-                  </label>
-                </div>
-
-                {/* Campo Email o Teléfono */}
-                {formData.contactType === 'email' ? (
-                  <input
-                    type="email"
-                    id="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-2.5 sm:py-3 rounded-lg border border-primary/20 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                    style={{ backgroundColor: 'var(--color-secondary)' }}
-                    placeholder="correo@ejemplo.com"
-                  />
-                ) : (
-                  <input
-                    type="tel"
-                    id="phone"
-                    required
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-2.5 sm:py-3 rounded-lg border border-primary/20 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                    style={{ backgroundColor: 'var(--color-secondary)' }}
-                    placeholder="682 19 35 35"
-                  />
-                )}
-              </div>
-
-              {/* Selección de Servicios */}
-              <div className="space-y-3">
-                <label className="block text-sm sm:text-base font-semibold text-foreground">
-                  Servicios disponibles *
-                </label>
-                <div className="space-y-3">
-                  {/* Depilación Láser con opciones del JSON */}
-                  <div className="rounded-lg border border-primary/20" style={{ backgroundColor: 'var(--color-secondary)' }}>
-                    <label className="flex items-start gap-3 p-4 cursor-pointer hover:bg-primary/5 transition-colors">
-                      <input
-                        type="checkbox"
-                        checked={formData.selectedServices.includes('Depilación Láser')}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setFormData({
-                              ...formData,
-                              selectedServices: [...formData.selectedServices, 'Depilación Láser']
-                            });
-                          } else {
-                            setFormData({
-                              ...formData,
-                              selectedServices: formData.selectedServices.filter(s => s !== 'Depilación Láser'),
-                              depilacionSelections: []
-                            });
-                          }
-                        }}
-                        className="mt-1 w-4 h-4 text-primary focus:ring-primary"
-                      />
-                      <div className="flex-1">
-                        <span className="text-sm sm:text-base font-medium text-foreground">Depilación Láser</span>
-                        <p className="text-xs sm:text-sm text-muted-foreground mt-1">Tecnología de última generación para una depilación definitiva</p>
-                      </div>
-                    </label>
-
-                    {/* Opciones de Depilación cuando está seleccionado */}
-                    {formData.selectedServices.includes('Depilación Láser') && (
-                      <div className="px-4 pb-4 space-y-4 border-t border-primary/10 pt-4">
-                        {/* Pack Bonos Chica */}
-                        <div className="space-y-3">
-                          <h4 className="text-xs sm:text-sm uppercase tracking-wide text-muted-foreground font-semibold">Pack Bonos Chica</h4>
-                          {pricesData.packBonosChica.map((pack, packIndex) => (
-                            <div key={`chica-${packIndex}`} className="space-y-2">
-                              <div className="text-sm font-medium text-foreground">{pack.zona}</div>
-                              <div className="space-y-2 pl-4">
-                                {pack.opciones.map((opcion, opcionIndex) => {
-                                  const selectionKey = `chica-${packIndex}-${opcionIndex}`;
-                                  const isSelected = formData.depilacionSelections.some(
-                                    s => s.tipo === 'chica' && s.zona === pack.zona && s.sesiones === opcion.sesiones
-                                  );
-                                  return (
-                                    <label key={selectionKey} className="flex items-center gap-3 cursor-pointer">
-                                      <input
-                                        type="checkbox"
-                                        checked={isSelected}
-                                        onChange={(e) => {
-                                          if (e.target.checked) {
-                                            setFormData({
-                                              ...formData,
-                                              depilacionSelections: [
-                                                ...formData.depilacionSelections,
-                                                { tipo: 'chica', zona: pack.zona, sesiones: opcion.sesiones, precio: opcion.precioFinal }
-                                              ]
-                                            });
-                                          } else {
-                                            setFormData({
-                                              ...formData,
-                                              depilacionSelections: formData.depilacionSelections.filter(
-                                                s => !(s.tipo === 'chica' && s.zona === pack.zona && s.sesiones === opcion.sesiones)
-                                              )
-                                            });
-                                          }
-                                        }}
-                                        className="w-4 h-4 text-primary focus:ring-primary"
-                                      />
-                                      <span className="text-xs sm:text-sm text-foreground">
-                                        {opcion.sesiones} sesión{opcion.sesiones > 1 ? 'es' : ''}
-                                      </span>
-                                    </label>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Pack Bonos Chico */}
-                        <div className="space-y-3 pt-4 border-t border-primary/10">
-                          <h4 className="text-xs sm:text-sm uppercase tracking-wide text-muted-foreground font-semibold">Pack Bonos Chico</h4>
-                          {pricesData.packBonosChico.map((pack, packIndex) => (
-                            <div key={`chico-${packIndex}`} className="space-y-2">
-                              <div className="text-sm font-medium text-foreground">{pack.zona}</div>
-                              <div className="space-y-2 pl-4">
-                                {pack.opciones.map((opcion, opcionIndex) => {
-                                  const selectionKey = `chico-${packIndex}-${opcionIndex}`;
-                                  const isSelected = formData.depilacionSelections.some(
-                                    s => s.tipo === 'chico' && s.zona === pack.zona && s.sesiones === opcion.sesiones
-                                  );
-                                  return (
-                                    <label key={selectionKey} className="flex items-center gap-3 cursor-pointer">
-                                      <input
-                                        type="checkbox"
-                                        checked={isSelected}
-                                        onChange={(e) => {
-                                          if (e.target.checked) {
-                                            setFormData({
-                                              ...formData,
-                                              depilacionSelections: [
-                                                ...formData.depilacionSelections,
-                                                { tipo: 'chico', zona: pack.zona, sesiones: opcion.sesiones, precio: opcion.precioFinal }
-                                              ]
-                                            });
-                                          } else {
-                                            setFormData({
-                                              ...formData,
-                                              depilacionSelections: formData.depilacionSelections.filter(
-                                                s => !(s.tipo === 'chico' && s.zona === pack.zona && s.sesiones === opcion.sesiones)
-                                              )
-                                            });
-                                          }
-                                        }}
-                                        className="w-4 h-4 text-primary focus:ring-primary"
-                                      />
-                                      <span className="text-xs sm:text-sm text-foreground">
-                                        {opcion.sesiones} sesión{opcion.sesiones > 1 ? 'es' : ''}
-                                      </span>
-                                    </label>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <label className="flex items-start gap-3 p-4 rounded-lg border border-primary/20 hover:border-primary/40 transition-colors cursor-pointer"
-                    style={{ backgroundColor: 'var(--color-secondary)' }}>
-                    <input
-                      type="checkbox"
-                      checked={formData.selectedServices.includes('Presoterapia')}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setFormData({
-                            ...formData,
-                            selectedServices: [...formData.selectedServices, 'Presoterapia']
-                          });
-                        } else {
-                          setFormData({
-                            ...formData,
-                            selectedServices: formData.selectedServices.filter(s => s !== 'Presoterapia')
-                          });
-                        }
-                      }}
-                      className="mt-1 w-4 h-4 text-primary focus:ring-primary"
-                    />
-                    <div className="flex-1">
-                      <span className="text-sm sm:text-base font-medium text-foreground">Presoterapia</span>
-                      <p className="text-xs sm:text-sm text-muted-foreground mt-1">Tratamiento de drenaje linfático que mejora la circulación</p>
-                    </div>
-                  </label>
-
-                  <label className="flex items-start gap-3 p-4 rounded-lg border border-primary/20 hover:border-primary/40 transition-colors cursor-pointer"
-                    style={{ backgroundColor: 'var(--color-secondary)' }}>
-                    <input
-                      type="checkbox"
-                      checked={formData.selectedServices.includes('Hydroface')}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setFormData({
-                            ...formData,
-                            selectedServices: [...formData.selectedServices, 'Hydroface']
-                          });
-                        } else {
-                          setFormData({
-                            ...formData,
-                            selectedServices: formData.selectedServices.filter(s => s !== 'Hydroface')
-                          });
-                        }
-                      }}
-                      className="mt-1 w-4 h-4 text-primary focus:ring-primary"
-                    />
-                    <div className="flex-1">
-                      <span className="text-sm sm:text-base font-medium text-foreground">Hydroface</span>
-                      <p className="text-xs sm:text-sm text-muted-foreground mt-1">Tratamiento facial profundo de hidratación y limpieza</p>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
-              {/* Mensajes de estado */}
-              {sendStatus === 'success' && (
-                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400">
-                  <p className="text-sm sm:text-base font-medium">¡Reserva enviada con éxito!</p>
-                  <p className="text-xs sm:text-sm mt-1">Te contactaremos pronto.</p>
-                </div>
-              )}
-
-              {sendStatus === 'error' && (
-                <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400">
-                  <p className="text-sm sm:text-base font-medium">Error al enviar la reserva</p>
-                  <p className="text-xs sm:text-sm mt-1">Por favor, inténtalo de nuevo o contáctanos directamente.</p>
-                </div>
-              )}
-
-              {/* Botones */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
-                <button
-                  type="submit"
-                  disabled={isSending || sendStatus === 'success'}
-                  className="btn-primary px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg w-full sm:flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSending ? 'Enviando...' : sendStatus === 'success' ? 'Enviado ✓' : 'Enviar'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsBookingModalOpen(false);
-                    setSendStatus('idle');
-                  }}
-                  disabled={isSending}
-                  className="btn-secondary px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base md:text-lg w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Cancelar
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
       )}
 
       {/* Footer */}

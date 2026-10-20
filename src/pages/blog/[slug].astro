@@ -85,7 +85,7 @@ const title = `${post.data.title} | ${SITE.name}`;
             Te atendemos en Esthetic Laser, junto al Eroski de Ctra. San Sebastián.
           </p>
           <div class="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="/?reservar=1" class="btn-primary">Reservar cita</a>
+            <a href={SITE.whatsappBookingUrl} class="btn-primary" target="_blank" rel="noopener noreferrer">Reservar cita</a>
             <a href="/#servicios" class="btn-secondary">Ver {SERVICE_LABELS[post.data.service]}</a>
           </div>
         </div>
